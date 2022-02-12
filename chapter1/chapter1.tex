@@ -2,28 +2,28 @@
 \chapter{Introduction} \label{ch:introduction}
 \section{Overview}
 \subsection{Early artificial intelligence references}
-Since ancient times, the human being has dreamed of artificial intelligence. One of the first existing records dates back to \textit{Aristotle} (384–322 BCE) in his book \textit{Politics}, dreaming of machines that would think by themselves and act autonomously with the purpose of allowing the humans enjoy leisure. In 10-70 CE, the mathematician and engineer \textit{Hero of Alexandria} designed several ancient automatons, one of the most famous was an automated theater that would play short performances in front of the audience. 
+Since ancient times, the human being has dreamed of artificial intelligence. One of the first existing records dates back to \textit{Aristotle} (384–322 BCE) in his book \textit{Politics}, dreaming of machines that would think by themselves and act autonomously with the purpose of allowing the humans enjoy leisure. In 10-70 CE, the mathematician and engineer \textit{Hero of Alexandria} designed several ancient automatons, one of the most famous was an automated theater that would play short performances in front of the audience.
 
-In the 9th century, the three Persian brothers known as the Banū Mūsā wrote the book of Ingenious Devices, where they illustrated hundreds of automatons and other mechanical devices (timing and delay devices, automated valves, etc.) and described how to use them. 
+In the 9th century, the three Persian brothers known as the Banū Mūsā wrote the book of Ingenious Devices, where they illustrated hundreds of automatons and other mechanical devices (timing and delay devices, automated valves, etc.) and described how to use them.
 
 In the middle ages, the philosopher, scientist and bishop Albert Magnus (13th century) manufactured several automatons, a talking head among them, which was able to imitate human voice and breadth. Later on, in the renaissance, the polymath Leonardo da Vinci designed various automatons (15th century). One of them, known as the mechanical knight, is probably the first anthropomorphous automaton we have record of. This automaton was able to perform basic human-like motions through a system of pulleys and cables. Modern history represented the golden era of automatons. One of the most famous automaton creators was the watchmaker Pierre Jaquet-Droz (18th century), who built a number of automatons, including a three-year-old child that could write any letter of the alphabet. Other significant automaton creators of the era were Wolfgang von Kempelen (1734-1804), who built the Turk, an automaton that could beat any human at chess\footnote{Although after his death, it was discovered that it was actually nothing more than an automaton operated by a person from inside a wooden cabinet }, and Jacques de Vaucanson (1709-1782), who built a number of automatons, including a duck that could eat and drink. Despite the complexity and ingenuity of these automatons, they were all purely mechanical and operated without any form of artificial intelligence.
 
 There are also historical references to artificial intelligence in form of fiction stories. In \textit{The city of brass"}, one of the \textit{One Thousand and One Nights} (around 10th century), the protagonist, a thief, comes across a brass city ruled by a wizard who has created a brass antrhopomorphous automaton that can talk and move like a human. In the 19th century, \textit{E.T.A. Hoffmann} (1776-1822) wrote the story \textit{The Sandman}, where the protagonist falls in love with an automaton created by a professor, without realizing she is actually a machine, and then suffers a mental breakdown when he finds out..This automaton, known as Olympia, is able to move, talk and sing, but it is later revealed that she is actually a machine that has been created. In the novel \textit{Frankenstein} writen by Mary Shelley in 1818, the scientist \textit{Victor Frankenstein} creates a human-like creature out of body parts of different people. Although this creature was not a machine, it is often seen as one of the first examples of intelligent creation.
 
 
-The first recorded use of the term \textit{robot} was in the play \textit{R.U.R.} (Rossum’s Universal Robots) by the Czech writer \textit{Karel Čapek} (1920), in which robots are manufactured as slaves to do the manual labor that humans do not want to do. This play is often seen as the beginning of the science fiction genre. 
+The first recorded use of the term \textit{robot} was in the play \textit{R.U.R.} (Rossum’s Universal Robots) by the Czech writer \textit{Karel Čapek} (1920), in which robots are manufactured as slaves to do the manual labor that humans do not want to do. This play is often seen as the beginning of the science fiction genre.
 
-In 1941, the science fiction writer Isaac Asimov published a short story called \textit{Runaround}, in which he introduced the three laws of robotics (depicted below), which are still used today as the basis for the ethical design of robots. 
+In 1941, the science fiction writer Isaac Asimov published a short story called \textit{Runaround}, in which he introduced the three laws of robotics (depicted below), which are still used today as the basis for the ethical design of robots.
 
 
 \begin{enumerate}
-	
+
 	\item A robot may not injure a human being or, through inaction, allow a human being to come to harm.
-	
+
 	\item A robot must obey the orders given to it by human beings, except where such orders would conflict with the First Law.
-	
+
 	\item A robot must protect its own existence as long as such protection does not conflict with the First or Second Law.
-	
+
 \end{enumerate}
 
 The artificial intelligence dream has come and gone in waves over the years, but it has never lost its appeal to the human imagination. Each time a new wave of artificial intelligence hits, it brings with it renewed hope for the possibility of machines that can think and act for themselves. However, it has not been until recently that artificial intelligence has begun to show significant promise for actually becoming a reality.
@@ -65,18 +65,9 @@ Two of the applications covered in this thesis belong to the speech technology f
 
 Finally, the last application covered in this thesis tackles the problem of sales forecasting in the field of logistics. Two systems with two different deep learning techniques (sequence-to-sequence models and transformers) are proposed. The results of this work show that it is possible to build end to end systems to predict the sales of multiple individual products, at multiple points of sale and different times. The proposed model beats the state of the art alternatives found in the bibliography. This work has been submited to the \textit{Expert Systems With Applications} journal, and is currently under revision.
 
-\section{Outline}
-This thesis is organized as follows.
+\section{Thesis structure}
+This thesis is organized as follows. Chapter 2 covers the background needed to understand the methods and algorithms applied in the following chapters. Chapter 3 proposes a new deep learning activation function, the modulus, and shows its benefits over other activation functions. Chapter 4 studies how to combine pretrained models using knowledge distillation. Chapter 5 proposes the application of sequence-to-sequence models and transformers to approach the sales forecasting problem from an end-to-end perspective. Chapter 6 presents an end-to-end keyword spotting system with convolutional networks.Chapters 7 proposes a state-of-the-art multispeaker Text-To-Speech with prosody modeling. Finally, chapter 8 wraps the general conclussions of the studies presented in the previous chapters.
 
-\begin{itemize}
-	\item \textbf{Chapter 2}: covers the background needed to understand the methods applied in the following chapters.
-	\item \textbf{Chapter 3}: the modulus activation function.
-	\item \textbf{Chapter 4}: distilling the knowledge of pretrained models
-	\item \textbf{Chapter 5}: end-to-end sales forecasting using sequence-to-sequence models and transformers.
-	\item \textbf{Chapter 6}: keyword spotting with convolutional networks.
-	\item \textbf{Chapter 7}: multispeaker Text-To-Speech with prosody modeling.
-	\item \textbf{Chapter 8}: wraps the general conclussions of the studies presented in the previous chapters.
-\end{itemize}
 
 
 % Todo: add images
