@@ -273,7 +273,8 @@ Finally, another difference between modern and classical deep learning models is
 
 
 \subsection{Modern architectures}
-% Transformer, rnn, cnn
+In this subsection we describe three modern architectures from a general perspective: Convolutional Neural Networks (CNN), Recurrent Neural Networks (RNN) and Transformers.
+
 \subsubsection{Convolutional neural networks}
 A Convolutional Neural Network (CNN) is a type of feed-forward neural network that is commonly used to process data that have grid-like topology \cite{Goodfellow2016}. Common examples of these data are time-series (1D), images (2D) or videos (3D). CNNs are not new, and one of the most important primitive CNN is known as \textit{Neocognitron}, a neural architecture published by \textit{Kuniko Fukushima} \cite{fukushima1980} in 1979, as a model inspired in the primary cortex of the human brain that was able to recognize Japanese handwritten characters. This model was similar to modern convolutional neural networks, and even featured similar properties like weight sharing and translation equivariance. The \textit{Neocognitron} inspired future works like \textit{LeNet-5}, a 7-layer convolutional neural network (see figure \ref{fig:lenet5}) trained with \textit{backpropagation} to recognize handwritten digits \cite{lecun1998}. 
 
@@ -402,9 +403,186 @@ As it can be noticed in equation \ref{eq:scdotprod}, the dot-product used to com
 \end{figure}
 
 % TODO: Add bias variance tradeoff section and a model capacity one.
-\subsection{Generative deep learning models}
-% NormFlow, GAN, VAE, AR
-\subsubsection{Autoregressive models}
+\subsection{Deep Generative Models}
+Generative modeling with deep learning is one of the most current trending topics in the machine learning research community. The models in this family learn the probability distribution over multiple variables of the data in one way or another. This means that the generative models, in order to generate new data, need to get a deep understanding of the structure of that data distribution \cite{Goodfellow2016}.
+
+The goal of the deep generative models is to learn to approximate the probability of the data ($p_\mathrm{data}$) in an unsupervised way. In other words, the data generator needs to find $\theta$ so that $p_\mathrm{data}(x) \approx p_\mathrm{model}^\theta(x)$ given a metric of similarity \cite{Goodfellow2016}. The general framework consists of collecting a large amount of data samples from a specific domain and train a deep learning model that is able to generate new data that \textit{looks like}\footnote{we will revisit the problem of the evaluation afterwards.} the original data. 
+
+The family of deep generative models is very diverse, and the models can be categorized in different types depending on the way they solve the generative task. Figure \ref{fig:generativetaxonomy} shows the taxonomy of the type of models discussed in this subsection. Some of the models allow evaluation explicitly the learned probability of data $p_\theta(x)$, others provide an approximation for that distribution, and the others do not provide a way to interact with the probability density, but provide operations that require the models to implicit have knowledge of it \cite{Goodfellow2016}. In this subsection we describe the following models:\textit{ Fully Visible Belief Networks} (FVBN), \textit{Variational Auto Encoders} (VAE), \textit{Generative Adversarial Networks} (GAN) and \textit{Normalizing Flows} (NF).
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{chapter2/images/generativetaxonomy}
+	\caption{Taxonomy of the most common deep generative models.}
+	\label{fig:generativetaxonomy}
+\end{figure}
+
+
+\subsubsection{Fully Visible Belief Networks}
+The \textit{Fully Visible Belief Networks} (FVBN) are a family of probabilistic models that use the chain rule of probabilities to model the probability density of the data ($p(x)$) \cite{smith2018}. For that, $p(x)$ is decomposed into a set of conditional probabilities $p(x^(t)| x^(1), x^(2), ..., x^(t-1))$ that when multiplied together form  $p(x)$, as shown in equation \ref{eq:fvbn}.
+
+\begin{equation}
+	\label{eq:fvbn}
+	p_{model}(x) = \prod_{i=1}^{T} p(x^{(t)}| x^{(1)}, x^{(2)}, ..., x^{(t-1)})
+\end{equation}
+
+The \textit{FVBN} models provide a fully tractable probability density function \cite{Goodfellow2016}, and are well suited for modeling sequential data such as text or speech \cite{Wang2017,Shen2018,Liu2019}. They have also been applied to model images, by turning the images into a sequence of pixels \cite{Oord2016, Oord2016b}.
+
+The basic operation function of FVBN is very simple. At training time, a model is trained to predict the next sample of a sequence $x(t)$, given the previous samples $ x^{(1)}, x^{(2)}, ..., x^{(t-1)}$. This operation is known as \textit{teacher forcing} \cite{williams1989, goyal2016, Goodfellow2016}, as the model is feed with the original samples of the sequence being modeled. At inference time, a start sample $\hat{x}^{(1)}$ is provided as input for the model, and it predicts a probability distribution $p(x^{(2)}|\hat{x}^{(1)})$ from which the second sample is drawn $\hat{x}^{(2)}$. Next, $ \hat{x}^{(1)}$ and $\hat{x}^{(2)}$ are feed into the model to get the probability distribution of the third sample $p(x^{(3)}|\hat{x}^{(1)}, \hat{x}^{(2)})$ is drawn. The process continues until a stop criterion is reached. The inference operating mechanism is commonly referred \textit{free mode} \cite{Goodfellow2016}, as the model is feed with previously generated samples. Normally, the a deep learning model is used to train \textit{FVBN}, in particular \textit{RNNs} and \textit{Transformers} are some of the most common choices. Figure \ref{fig:charrnn} shows an example of \textit{char-rnn}  \cite{Sutskever2011, Graves2013}, a \textit{FVBN} used to generate natural language.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\linewidth]{chapter2/images/char_rnn}
+	\caption{Architecture of \textit{char-rnn}, a deep learning model used for natural language generation at character level, based on a multilayer recurrent neural network. The nodes represent RNN cells (e.g. \textit{GRU} cells) and the rectangles are the inputs and outputs of the model. The dashed arrows represent the character sampling process.}
+	\label{fig:charrnn}
+\end{figure}
+
+
+As it can be noticed, the training process, provided with the right algorithms, can be performed in parallel. However, the inference process needs to be done sequentially, given that to generate future samples, all the past samples need to have been previously generated. For this reason, \textit{FVBN} are known to be inefficient at inference time when used to generate long sequences.
+
+As an example, a shallow version of the \textit{char-rnn} model of order\footnote{the probability distribution of the next character is conditioned to the previous 100 characters} 100 has been trained using 800 books from the open source \textit{Gutenberg} project\footnote{https://www.gutenberg.org/} \cite{gerlach2020}. The model consists of a recurrent neural network that is trained to predict the \textit{Multinoulli} distribution for the next character, conditioned to the previous 100 characters as input. The following is an example of generation where the first 100 characters of the \textit{War of the Worlds} book from \textit{Herbert George Wells} are feed as input.
+
+\chapquote{\textbf{``No one would have believed in the last years of the nineteenth century that this world was being wat}ched together far out
+	to the thought, 'that will cled it announced for them bloody I have
+	last instant all the strayes as thomass us? This is, and the single
+	War camp, until we proguted it toward the mouncin to lint of the
+	enemy respectful, then the ribonament had been their courts and papers
+	she been ended bent tense freely after good to the eyes to avole.
+	The gather flooded by Wayer a great time home engaged in the
+	exhausting day of the dutie of summers and jangers untourant altogether
+	of mountains. But was the mystery arising half die for some regarding
+	the raider. This top was a Catelumberhand life by the river were
+	business, and other ebbsake and septimum at the campaich, wa, and he
+	showed my brethren.''}{\textit{char-rnn}}{2017}
+
+It can be noticed that the model has been able to generate many grammatically correct words, however the text generated is not coherent. For that, larger and more modern approaches would be needed. \textit{BERT} \cite{davlin2019} and \textit{GPT-3} \cite{floridi2020} are modern examples of deep language models.
+
+Other examples of modern \textit{FVBN} applications are \textit{PixelRNN} and \textit{Tacotron 2} \cite{Wang2017,Shen2018,Liu2019}. \textit{PixelRNN} \cite{Oord2016, Oord2016b} is an extension of char-rnn to two dimensions, where a set of pixels of an image are given as input to the model, and its task is to predict the remaining pixels in an autoregressive manner. \textit{Tacotron 2} is a conditional \textit{FVBN} that is used to perform text-to-speech. This model gets as input a text to be synthesized, and then a \textit{FVBN} (more commonly referred as a decoder), predicts the frames of a \textit{mel-spectrogram} in an autoregressive manner. The \textit{mel-spectrogram} is further processed by a \textit{vocoder} model \cite{vanderoord2016, lorenzotrueba2019a} to get an audio signal in temporal domain.
+
 \subsubsection{Variational auto encoders}
+\textit{Variational Auto Encoders} (\textit{VAE} hereafter) are another alternative family of methods used to approximate $p_\mathrm{data}(x)$ \cite{kingma2019}. \textit{VAE} are the probabilistic versions of \textit{Auto Encoders}. An \textit{Auto Encoder} is a deep learning model that is trained to reproduce its input $\mathbf{x}$ in its output $\mathbf{y}$. The input vector $\mathbf{x}$ is transformed into a compressed representation $\mathbf{h}=f(\mathbf{x})$ using an encoder $f$, and that vector $\mathbf{h}$ is used to produce $\mathbf{y}=g(\mathbf{h})=g(f(\mathbf{x}))$ given a decoder $g$. The representation $\mathbf{h}$ is a vector of lower dimension than $\mathbf{x}$, and the encoder is forced to prioritize which aspects of the input should be included in $\mathbf{h}$ so that the decoder can recover $\mathbf{y}\approx \mathbf{x}$ \cite{Goodfellow2016}. The encoder and the decoder are deep learning models. 
+
+The main idea of \textit{VAEs} consists on replacing the $\mathbf{h}$ vector by the parameters of a distribution $\mathbf{\upsilon}$, generally chosen to be \textit{isotropic Gaussian} \cite{asperti2021}, from which a latent vector is sampled $\mathbf{z} \sim P(\mathbf{\upsilon})$. Once the model is trained, new samples $\mathbf{\hat{x}}$ can be generated by decoding samples drawn from the prior distribution $\mathbf{\hat{x}} = g(\mathbf{z})$ where $\mathbf{z} \sim P(\mathbf{\upsilon})$. The structure of this deep learning architecture is shown in figure \ref{fig:vae}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{chapter2/images/vae}
+	\caption{Diagram showing how a \textit{Variational Auto Encoder} is structured. }
+	\label{fig:vae}
+\end{figure}
+
+
+
+\textit{VAE} provide an explicit but intractable density function which cannot be directly optimized \cite{Goodfellow2016}. Instead, variational \textit{Bayes} methods are used to approximate the intractable probability distributions. In this setting, the posterior probability $p_\mathbf{\theta}(\mathbf{z}|\mathbf{x})$ is intended to be computed. Applying the \textit{Bayes} theorem, we can express $p_\mathbf{\theta}(\mathbf{z}|\mathbf{\theta}{x}) = \frac{p_\mathbf{\theta}(\mathbf{\theta}{x}|\mathbf{z}) \cdot p_\mathbf{\theta}(\mathbf{z})}{p_\mathbf{\theta}(\mathbf{\theta}{x})}$. In this equation, $p_\mathbf{\theta}(\mathbf{x}) = \int{p_\mathbf{\theta}(\mathbf{x}) \cdot p_\mathbf{\theta}(\mathbf{x}|\mathbf{z})} \,d\mathbf{z}$ is intractable, and hence it is not possible to optimize the parameters of a model to approximate that distribution using maximum likelihood. Here is where variational methods take place. A known probability distribution $q$ with parameters $\phi$ will be used to approximate $p$ ($q_\phi(\mathbf{z}|\mathbf{x}) \approx p_\mathbf{\theta}(\mathbf{z}|\mathbf{x})$). For that, the \textit{Kullback Leibler} divergence ($D_{KL}$) metric will be used to minimize the differences between the two distributions, as shown in equation \ref{eq:dklvae} \cite{kingma2019}. As shown in equation \ref{eq:lbvae}, $\mathcal{L}(\mathbf{x}, \mathbf{\theta}, \phi)$ represents a lower bound (often referred as Evidence Lower Bound, \textit{ELBO}, or negative free energy) in the optimization function as shown in equation \ref{eq:vaelbasloss}, given that $D_{K L}\left(q_{\phi}(\mathbf{z} \mid \mathbf{x}) \| p_{\mathbf{\theta}}(\mathbf{z} \mid \mathbf{x})\right)$ is always greater or equal to zero. Given that the lower bound is tractable, the optimiztion problem can be approximated as shown in equation \ref{eq:vaeopt}. In other words, maximizing the lower bound assures that the log-likelihood of the data is at list as large as its lower bound \cite{wei2021}.
+
+\begin{equation}
+\label{eq:dklvae}
+\min_{\phi} D_{KL}\left(q_\phi(\mathbf{z}|\mathbf{x}), p_\mathbf{\theta}(\mathbf{z}|\mathbf{x})\right)
+\end{equation}
+
+\begin{equation}
+\label{eq:lbvae}
+\begin{aligned}
+\log \left(p_{\mathbf{\theta}}(\mathbf{x})\right) =& \underbrace{D_{K L}\left(q_{\phi}(\mathbf{z} \mid \mathbf{x}) \| p_{\mathbf{\theta}}(\mathbf{z} \mid \mathbf{x})\right)}_{>0} \ldots \\
+&+\underbrace{\mathbb{E}_{\mathbf{z}} \log p_{\mathbf{\theta}}(\mathbf{x} \mid \mathbf{z})-D_{K L}\left(q_{\phi}(\mathbf{z} \mid \mathbf{x}) \| p_{\mathbf{\theta}}(\mathbf{z})\right)}_{\mathcal{L}(\mathbf{x}, \mathbf{\theta}, \phi)}
+\end{aligned}
+\end{equation}
+
+\begin{equation}
+\label{eq:vaelbasloss}
+\log p_{0}(\mathbf{x}) \geq \mathcal{L}_{\mathbf{\theta}, \phi}\left(\mathbf{x}\right)
+\end{equation}
+
+\begin{equation}
+\label{eq:vaeopt}
+\mathbf{\theta}, \phi \leftarrow \underset{\mathbf{\theta}, \phi}{\arg \max } \sum_{i=1}^{N}\left(\mathcal{L}_{\mathbf{\theta}, \phi}(\mathbf{x})\right)
+\end{equation}
+
+The first term of the lower bound of equation \ref{eq:lbvae} ($\mathbb{E}_{\mathbf{z}} \log p_{\mathbf{\theta}}(\mathbf{x} \mid \mathbf{z})$) is known as the reconstruction error, and meausres how dissimilar the input and the output are. The second term ($D_{K L}\left(q_{\phi}(\mathbf{z} \mid \mathbf{x}) \| p_{\mathbf{\theta}}(\mathbf{z})\right)$), usually referred as the divergence error, measures how dissimilar is the prior and the encoded distributions. The probability distributions $p_\mathbf{\theta}$ and $q_\phi$ are two separated deep learning models (with parameter sets $\mathbf{\theta}$ and $\phi$). Normally, the prior distribution over the latent variables $P(\mathbf{z})$ is chosen to be a an \textit{isotropic Gaussian} $N(0,I)$ \cite{asperti2021, wei2021} and in order to assure that the encoder-decoder architecture is differentiable everywhere, the \textit{reparameterization trick} is used as a mechanism to replace the classical non-differentiable sampling procedure $\mathbf{z} \sim N(\mathbf{\mu}, \mathbf{\sigma})$ by an equivalent version $\mathbf{z} = \mathbf{\mu} + \epsilon \cdot \mathbf{\sigma}$ where $\epsilon \sim (N(0,I))$ in which $z$ is differentiable with respect to $\mathbf{\mu}$ and $\mathbf{\sigma}$ \cite{kingma2019}.
+
+
 \subsubsection{Generative adversarial networks}
+\textit{Generative Adversarial Networks} (\textit{GAN} hereafter) are a type of deep generative models first published in 2014 \cite{Goodfellow2014}. They consist of a dual deep learning model, where the first component, known as the generator, tries to generate realistic data samples, and the the generator's adversary, the discriminator, tries to determine if a sample is real or generated. As an analogy, one can think of the generator as playing the role of a counterfeiter, and the discriminator playing the role of a policeman. The role of the counterfeiter is to try to fool the policeman, and the latter will try to catch the counterfeiter. Figure \ref{fig:police_counterfeiter} shows this process graphically.  
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=1\textwidth]{chapter2/images/police_counterfeiter.eps}
+	\label{fig:police_counterfeiter}
+	\caption{\textit{Generative Adversarial Network diagram, showing the role of each player and the error signals backpropagated through the network.} }
+\end{figure}
+
+The training process of a GAN is generally a zero-sum game, where the optimization succeeds when the system reaches the \textit{Nash} equilibrium. The goal of the algorithm is to learn to represent an estimated distribution ($p_{\mathrm{model}}$) of a given data distribution ($p_{\mathrm{data}}$). Moreover, GANs are designed to be unbiased, in the sense that provided with enough data, a model with enough capacity and the proper learning algorithm, the true probability distribution of the data can be perfectly recovered: $p_{\mathrm{model}} = p_{\mathrm{data}}$. As an important practical aspect of GANs, once the algorithm has converged, the generator is able to provide samples of $p_\mathrm{model}$, however the learned distribution is implicit. GANs provide no access to the learned distribution. 
+
+In the GAN systems, the generator $g$ is a deep learning model with parameters $\mathbf{\theta^g}$ that takes a latent vector $\mathbf{z} \sim P(\mathbf{z})$ as input, where $P$ is a prior distribution (usually chosen to be a \textit{Gaussian} distribution), and produces a sample $\hat{\mathbf{x}}=g(\mathbf{z})$. The discriminator $d$ is another deep learning model with parameters $\mathbf{\theta^d}$ that takes a sample $\mathbf{x}$ as input, and produces a binary output $d(\mathbf{x})$ that models the probability of the input sample $\mathbf{x}$ being real or generated \cite{Goodfellow2014}. In this setting, GAN objective can be formulated with a \textit{minimax} objective, as shown in equation \ref{eq:ganminimax}. The default loss function (represented as $v$), is defined in equation \ref{eq:ganloss}. Unfortunately, the training objective is non-convex in $\theta^g$ and $\theta^d$, which makes training difficult when using complex neural networks, often leading to underfitted models \cite{Goodfellow2016b,Goodfellow2016}. In a simpler manner, when one of the two networks becomes too strong, the system diverges. Stabilization of the GANs remains an open problem, although some advances have been recently made \cite{arjovsky2017, shaobo2017, wang2022}.
+
+\begin{equation}
+	\label{eq:ganminimax}
+	g^*, d^* = \arg \min_g \max_d v(g, d)
+\end{equation}
+
+\begin{equation}
+	\label{eq:ganloss}
+	v(\theta^g, \theta^d) = \mathbb{E}_{\mathbf{x}\sim p_\mathrm{data}} \log d(\mathbf{x}) + \mathbb{E}_{\mathbf{x}\sim p_{model}} \log (1 - d(\mathbf{x}))
+\end{equation}
+
+The generator and discriminator models must be differentiable everywhere, otherwise the model cannot be trained with backpropagation. As an important detail that can be noticed in equation \ref{eq:ganminimax}, both players have a cost function (equation \ref{eq:ganloss}) that depends on the superset  of parameters $(\theta^g, \theta^d)$, but every player can only change its own parameters, and not the adversary's.
+
+
+
 \subsubsection{Normalizing flows}
+\textit{Normalizing Flows} are another type of deep generative models that are used to approximate posterior distributions $\mathbf{p_\mathrm{data}}$. These models describe the transformation of a prior density function into an arbitrarily complex probability distribution $p_\mathrm{model}$, through a series of invertible mappings, by repeatedly applying the rule for change of variables \cite{rezende2015}. The output of the series of invertible functions applied to the prior distribution is still a valid probability distribution, and hence this type of models is known as normalizing flow. 
+
+A flow $f: \mathbb{R}^d \rightarrow \mathbb{R}^d$ is an invertible mapping $f^{-1} = g$ such that given a random variable $\mathbf{z} \sim p(z)$, then $g(f(\mathbf{z})) = \mathbf{z}$. If the random variable $\mathbf{z}$ is transformed using the flow $\mathbf{z'} = f(\mathbf{z})$, then the probability density function of $\mathbf{z'}$ could be calculated by applying the rule for change of variables, as shown in equation \ref{eq:flowcov}. Notice that the last form of the  equation \ref{eq:flowcov} comes from the application of the inverse function theorem \cite{rezende2015}.
+
+\begin{equation}
+\label{eq:flowcov}
+p'(\mathbf{z'}) = p(\mathbf{z}) \cdot \left| \det \frac{\partial f^{-1}}{\partial \mathbf{z'}} \right| = p(\mathbf{z}) \cdot \left| \det \frac{\partial f}{\partial \mathbf{z}} \right|^{-1}
+\end{equation}
+
+Invertible and differentiable flows are closed under composition \cite{kobyzev}. This means that when composing multiple flows, the resulting function is still a flow. That property is very important for building deep normalizing flows capable of modeling complex posterior distributions such as images. It can be easily seen from equation \ref{eq:flowcov}  \cite{rezende2015} that given a composition of $K$ flows $\mathbf{z_K}=f_K \circ ... f_1(\mathbf{z_0})$, the probability distribution $p_K(\mathbf{z_K})$ can be easily obtained as shown in equation \ref{eq:flowcovcomp} (express as log-probability for mathematical convenience).
+
+\begin{equation}
+\label{eq:flowcovcomp}
+\log p_K(\mathbf{z_K}) = \log p_0(\mathbf{z_0}) - \sum_{k-1}^{K} \log  \left| \det \frac{\partial f_k}{\partial z_{\mathbf{k-1}}} \right|
+\end{equation}
+
+
+The normalizing flow is trained by maximizing the likelihood of the normalized samples $g(\mathbf{x})$, which can be calculated in the normalized space by applying the volume correction as expressed in \ref{eq:flowcovcomp} \cite{papamakarios2017}. Once the model is trained, one can sample from the prior distribution $\mathbf{z} \sim p(\mathbf{z})$ and transform that latent variable into a data sample $\hat{\mathbf{x}} = f(\mathbf{z})$ \cite{rezende2015}.
+
+There are two main restrictions that have to be taken into account when designing neural architectures for normalizing flows. First, each flow block $f_i$ needs to be invertible, and second, the determinant of the \textit{Jacobian} of each flow block must be fast to compute. These two properties are absolutely necessary for being able to train deep learning based normalizing flows, and they represent the major difficulty currently under research. The most common solution at the time of writing this dissertation is to define the flows $f_i$ as affine-coupling blocks \cite{dinh2018}, and their structure is represented in figure \ref{fig:affinecouplingblock}. More formally, given an input vector $\mathbf{x}$, of size $\mathbf{D}$, an integer $d \in [2,D-1]$, a deep learning model $s$ and another $t$, the affine coupling block can be defined as shown in equation \ref{eq:affinecouplingblock}. It can be shown that the determinant of the \textit{Jacobian} of the affine coupling block transformation does not depend on the parameters of the networks $t$ and $s$, so they can be as compex as one wants. The whole operation can be seen as a scale and translate operation appliedover one part of the input vector $\mathbf{x_{d+1:D}}$, and conditioned over the other $\mathbf{x_{1:d}}$. The composition of multiple affine coupling blocks with shuffling operations builds \textit{RealNVP} \cite{dinh2018}, a deep normalizing flow that achieved remarkable results in computer vision.
+
+\begin{equation}
+\label{eq:affinecouplingblock}
+\begin{gathered}
+	 \mathbf{y} = \begin{cases} \mathbf{y_{1: d}} & = \mathbf{x_{1: d}} \\
+	\mathbf{y_{d+1: D}} & =\mathbf{x_{d+1: D}} \odot s\left(\mathbf{x_{1: d}}\right)+t\left(\mathbf{x_{1: d}}\right)\end{cases} \\
+	\mathbf{x} = \begin{cases}
+	\mathbf{x_{1: d}} &=\mathbf{y_{1: d}} \\
+	\mathbf{x_{d+1: D}} &=\left(\mathbf{y_{d+1: D}}-t\left(\mathbf{y_{1: d}}\right)\right) \odot s\left(\mathbf{y_{1: d}}\right)
+	\end{cases}
+\end{gathered}
+\end{equation}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{chapter2/images/affinecouplingblock}
+	\caption{Forward and backward computation graphs for affine \textit{coupling blocks}. Notice that $x_1$ and $x_2$ represent the input vector $x$ split in two parts, and the affine coupling operation produces two vectors $y_1$ and $y_2$ of the exact same size as $x_1$ and $x_2$, respectively. The nodes indicated with the letters $t$ and $s$ are arbitrarily complex neural networks that, conditioned to the first vector, produce scaling and translation weights to be applied over the second vector.}
+	\label{fig:affinecouplingblock}
+\end{figure}
+
+
+Other less common solutions to the same problem are known as masked autoregressive flows \cite{papamakarios2017}, inverse autoregressive flows \cite{kingma2016} or \textit{Glow} \cite{kingma2018}. They will not be covered here because it is out of the scope of this dissertation. 
+
+Thanks to the change of variable formula, the normalizing flows represent another alternative deep generative model with explicit and tractable density function.
+
+\subsubsection{Evaluation} \label{sec:dgmevaluation}
+One of the most important aspects of any discipline in science is to be able to properly measure the phenomenon under study. The field of generative models is not an exception. However, measuring how well a generative model performs can be an extremely difficult task \cite{Goodfellow2016}. There are several proxy approaches that aim to quantify the some aspects related to the performance of a generator \cite{theis2016a}, but we still do not have a general way to tackle this problem.
+
+Many of the applications of generative models deal with multimedia data such as images, music, speech, etc. Our way of determining if a set of synthetic media has good or bad quality is through perceptual judgement. Generative models can be evaluated using perceptual judgement, but as any type of judgement, it may be subject to biases. To avoid a biased evaluation, the evaluation set and the jury needs to be carefully chosen. Even if these pieces are designed carefully, there is still risk that this subjective evaluation completely fails \cite{Goodfellow2016}. One possible case is the hypothetical example in which a model learns to memorize the training data. In that case, the model will not be succeeding at the generation task, but a perceptual test will rank the model with very high performance. Other example could be a model which is collapsed into a mode in the data. For example, given a model is trained to generate images of cats and dogs, if the model only learns to generate high quality images of cats and never generates dogs', it may get a high score out of a subjective test, while it is completely failing to capture the variability of the data. For these reasons, it is well known that subjective quality of samples is not a reliable way of evaluating generative models \cite{denton2015}.
+
+Other common way to evaluate generative models consists of measuring the log likelihood of the $p_\mathrm{model}$ over a test set, when the log likelihood is tractable \cite{Goodfellow2016}. This approach may be informative in some cases, but it is not a solution at all, as it often may not be correlated with the perceptual quality. One example could be a speech synthesis model that models the silences in the recordings with a very small variance. The probability density in those regions would be extremely high, while perceptually we would not probably be interested on accurately reproducing background noise. Additionally, to be able to compare log-likelihoods from different models, it should be done under the same conditions. Aspects like data processing or the type of technology that is used to approximate the log likelihood can bias the results \cite{Goodfellow2016}.
+
+This topic is still an open research problem, and many studies have already worked on it \cite{theis2016a, sajjadi2018}. However, the problem is still unsolved.
+
+
+
