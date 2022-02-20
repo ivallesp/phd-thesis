@@ -36,12 +36,16 @@
 % distillation dependencies
 \usepackage{adjustbox}
 
+% Format titlepage date
+\usepackage{datetime}
 
 \author{Iván Vallés Pérez}
 \title{Contributions and applications to low resource deep learning modeling}
+\newdateformat{monthyeardate}{%
+	\monthname[\THEMONTH], \THEYEAR}
 
 \begin{document}
-\maketitle
+\include{titlepage/titlepage}
 
 \tableofcontents
 
