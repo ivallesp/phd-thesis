@@ -5,15 +5,15 @@ Text-to-speech systems recently achieved almost indistinguishable quality from h
 
 
 \section{Introduction}
-In the last five years speech technologies have improved considerably. The text-to-speech (TTS hereafter) field has been largely benefited by the rise of deep learning \cite{Sisman2021}, which allowed these systems to achieve near-human performance at synthesizing speech that is almost indistinguishable from human's. One of the first achievements was \textit{WaveNet} \cite{vanderoord2016}, a neural vocoder based on dilated causal convolutions that was able to surpass its predecessors in naturalness in 2016. With the rise of the attention mechanism and its variants \cite{bahdanau2015,vaswani2017,chaudhari2019}, \textit{Tacotron} \cite{Wang2017} and \textit{Tacotron 2} \cite{Shen2018,Liu2019} proposed a sequence to sequence architecture as an end-to-end TTS solution. These models were able to map input text (or phonemes) to a spectrogram that, given the right neural vocoder (\textit{WaveNet} for instance), would be converted into a sequence of waveform samples. 
+In the last five years speech technologies have improved considerably. The text-to-speech (TTS hereafter) field has been largely benefited by the rise of deep learning \cite{Sisman2021}, which allowed these systems to achieve near-human performance at synthesizing speech that is almost indistinguishable from human's. One of the first achievements was \textit{WaveNet} \cite{vanderoord2016}, a neural vocoder based on dilated causal convolutions that was able to surpass its predecessors in naturalness in 2016. With the rise of the attention mechanism and its variants \cite{bahdanau2015,vaswani2017,chaudhari2019}, \textit{Tacotron} \cite{Wang2017} and \textit{Tacotron 2} \cite{Shen2018,liu2019b} proposed a sequence to sequence architecture as an end-to-end TTS solution. These models were able to map input text (or phonemes) to a spectrogram that, given the right neural vocoder (\textit{WaveNet} for instance), would be converted into a sequence of waveform samples.
 
-TTS is fundamentally a generative modeling problem because a given sentence can be mapped to multiple utterances with different prosody and speaker characteristics \cite{Taylor2009}. \textit{Tacotron}, in its initial form, is a supervised model that performs a hard mapping between the input text and the output spectrograms. Therefore, the utterances generated using \textit{Tacotron}-like architectures, although natural, they follow the average prosody of the training set, not allowing to generate utterances of a sentence with multiple speaking styles.   
+TTS is fundamentally a generative modeling problem because a given sentence can be mapped to multiple utterances with different prosody and speaker characteristics \cite{Taylor2009}. \textit{Tacotron}, in its initial form, is a supervised model that performs a hard mapping between the input text and the output spectrograms. Therefore, the utterances generated using \textit{Tacotron}-like architectures, although natural, they follow the average prosody of the training set, not allowing to generate utterances of a sentence with multiple speaking styles.
 
 The authors of \cite{skerryryan2018} attempt to remediate the lack of expressiveness of the model by introducing a reference encoder consisting of a latent distribution that is conditioned on a reference mel-spectrogram (usually the target spectrogram, at training time). This distribution is learned by the model through a bottleneck that is intended to capture prosody aspects of the target spectrogram, preventing phonetic or speaker information to flow through. In practice, specially when using this approach in multi-speaker settings, the model tends to leak speaker information to the output. This represents a problem at inference time, when a synthetic neutral reference is provided (generally synthesized using a production system similar to \textit{Amazon Polly}), given that the synthesized speaker identity tends to resemble the reference instead of the target voice. This problem is known as speaker leakage and it was already reported in \cite{skerryryan2018}, where the authors emphasize the importance of properly tuning the size of the reference bottleneck to amend it.
 
-In \cite{Liu2020}, the authors propose using a multi-task version of \textit{Tacotron} to enhance the prosody of the syntheses. The approach described in the paper consists of jointly learning the target mel-spectrogram as well as the probability distribution of the phrase break patterns for each word. The work of \cite{liu2020expressive} proposes a novel training schema for \textit{Tacotron} where deep style features are extracted using the \textit{SER} framework (\cite{Zhang2018, Lotfian2019}). These features are later used for minimizing the style differences between the real and synthesized samples.  
+In \cite{liu2020c}, the authors propose using a multi-task version of \textit{Tacotron} to enhance the prosody of the syntheses. The approach described in the paper consists of jointly learning the target mel-spectrogram as well as the probability distribution of the phrase break patterns for each word. The work of \cite{liu2020c} proposes a novel training schema for \textit{Tacotron} where deep style features are extracted using the \textit{SER} framework (\cite{Zhang2018, Lotfian2019}). These features are later used for minimizing the style differences between the real and synthesized samples.
 
-In this work, we start from a multi-speaker \textit{Tacotron} architecture with a reference encoder (similar to \cite{skerryryan2018}) and propose two modifications: (1) we replace the pre-trained speaker embedding with a normalized speaker embedding using normalizing flows \cite{Kingma2018}, that allows sampling from the learned \textit{Gaussian} distribution and (2) we substitute the reference encoder with a residual encoder, which learns a latent distribution conditioned on the input phonetic information, allowing the model to capture and encode the residual attributes not present in the linguistic input and the speaker embedding. 
+In this work, we start from a multi-speaker \textit{Tacotron} architecture with a reference encoder (similar to \cite{skerryryan2018}) and propose two modifications: (1) we replace the pre-trained speaker embedding with a normalized speaker embedding using normalizing flows \cite{kingma2018}, that allows sampling from the learned \textit{Gaussian} distribution and (2) we substitute the reference encoder with a residual encoder, which learns a latent distribution conditioned on the input phonetic information, allowing the model to capture and encode the residual attributes not present in the linguistic input and the speaker embedding.
 
 Inspired by the work of \cite{Raitio2020}, we show how our proposed model achieves significantly higher prosody variation by measuring the difference in variance between the baseline and the proposed model across a set of features derived from the fundamental frequency, the energy, the signal to noise ratio and the speaking rate. These features capture most of the prosody variables (pitch, speed, loudness and timbre) \cite{Raitio2020} and allow performing objective comparisons between systems.
 
@@ -25,27 +25,27 @@ A \textit{Tacotron2}-based sequence to sequence model with \textit{location-base
 % TODO: \usepackage{graphicx} required
 \begin{figure}
 	\centering
-	
+
 	\includegraphics[width=1.0\linewidth]{tts/images/baseline_architecture}
-	
+
 	\vspace{0.5cm}
-	
+
 	\includegraphics[width=1.0\linewidth]{tts/images/proposed_architecture}
-	
+
 	\caption{Top: the baseline architecture. Bottom: the proposed architecture. The blue blocks represent pretrained parts of the network and the blocks with round edges are tensor operations.}
 	\label{fig:architectures}
 \end{figure}
 
 
-The proposed architecture builds upon the baseline model. We remove the dependency of the reference branch on the target spectrogram, because it tends to cause speaker/phonetic leakage (read the section 4 of the samples included in \cite{skerryryan2018}). It also slows down the inference process as it requires a production TTS system to provide the references. Instead, we introduce a learnable variational latent space conditioned on the phonetic information and a set of learnable free parameters that we name \textbf{residual branch}. The purpose of this branch is to encode the prosody information not present in the input linguistic features or in the speaker embedding vector in a new latent space (i.e. the residual prosody variance). Moreover, we normalize the speaker embedding vectors using normalizing flows based on the work of \cite{Kingma2018}, so that the normalized vectors follow a \textit{Gaussian} distribution.That change enables sampling from the speaker embedding latent space instead of just using the average embedding vector. This increases the coverage of the speaker embedding space, allowing smoother interpolations between speaker embedding vectors. The architecture proposed is depicted in figure \ref{fig:architectures}-bottom
+The proposed architecture builds upon the baseline model. We remove the dependency of the reference branch on the target spectrogram, because it tends to cause speaker/phonetic leakage (read the section 4 of the samples included in \cite{skerryryan2018}). It also slows down the inference process as it requires a production TTS system to provide the references. Instead, we introduce a learnable variational latent space conditioned on the phonetic information and a set of learnable free parameters that we name \textbf{residual branch}. The purpose of this branch is to encode the prosody information not present in the input linguistic features or in the speaker embedding vector in a new latent space (i.e. the residual prosody variance). Moreover, we normalize the speaker embedding vectors using normalizing flows based on the work of \cite{kingma2018}, so that the normalized vectors follow a \textit{Gaussian} distribution.That change enables sampling from the speaker embedding latent space instead of just using the average embedding vector. This increases the coverage of the speaker embedding space, allowing smoother interpolations between speaker embedding vectors. The architecture proposed is depicted in figure \ref{fig:architectures}-bottom
 
 
 
 
 \subsection{Speaker embedding normalization using normalizing flows}
-Normalizing flows \cite{rezende2016variational} are powerful methods for producing tractable distributions from which one can sample. Through a sequence of invertible transformations they transform a complex input distribution to a tractable probability distribution. The output distribution is usually chosen to be an isotropic unit \textit{Gaussian} to allow for smooth interpolations and efficient sampling. 
+Normalizing flows \cite{rezende2016variational} are powerful methods for producing tractable distributions from which one can sample. Through a sequence of invertible transformations they transform a complex input distribution to a tractable probability distribution. The output distribution is usually chosen to be an isotropic unit \textit{Gaussian} to allow for smooth interpolations and efficient sampling.
 
-\textit{Glow} \cite{Kingma2018}, a flow-based generative model, has shown significant improvements in computer vision generative modeling by adding invertible 1x1 convolutions to the sequence of transformations applied to the input. To train this model on one-dimensional speaker embedding vectors, we have switched the 2-dimensional convolutions with 1-dimensional ones.
+\textit{Glow} \cite{kingma2018}, a flow-based generative model, has shown significant improvements in computer vision generative modeling by adding invertible 1x1 convolutions to the sequence of transformations applied to the input. To train this model on one-dimensional speaker embedding vectors, we have switched the 2-dimensional convolutions with 1-dimensional ones.
 
 We train a normalizing flow over the pre-trained speaker embeddings described previously. The trained model attains a \textit{Gaussian} distributed latent space of speaker embeddings from which one can easily sample to create embeddings representing new, unseen speakers. The proposed architecture samples from the \textit{Gaussian} distribution defined by the normalized embeddings, both at training time and at inference time.
 
@@ -53,7 +53,7 @@ We train a normalizing flow over the pre-trained speaker embeddings described pr
 \subsection{Residual branch}
 The new residual branch is designed to learn the prosody-induced variance that cannot be explained by the linguistic features and the speaker embedding vector alone. It takes as input the linguistic features and a set of learnable free parameters\footnote{Notice that the dense layers that produce the residual latent distribution parameters do not have bias terms, so that all the bias is learned in the free parameters vector.}, conditioning on the target sentence and on a global prior. The motivation behind this design is to help the network learn different ways of uttering a given input sentence (linguistic features conditioning), and the potential global biases existing in our training dataset (free parameters).
 
-The output of the phonetic encoder is piped into a bi-directional recurrent neural network \cite{Schuster1997,graves2005} in order to get a representation independent of time. The last output of the recurrent neural network of both, forward and reverse passes (represented in equations \ref{eq:rnn1} and \ref{eq:rnn2} as $\mathbf{o_f}$ and $\mathbf{o_r}$, respectively), are  concatenated to form a fixed-size phonetic representation $[\mathbf{o_f}, \mathbf{o_r}]$. That vector is concatenated with a vector of free parameters $\mathbf{v_f}$ and the result is passed through two stacked dense layers to form the parameters of the residual latent distribution (as shown in equation \ref{eq:residual}, where $f$ represents the \textit{ReLU} activation function). The $h_{residual}$ vector is split in two vectors $h_{residual}^{\mu}$ and $h_{residual}^{\sigma}$ from where a latent vector $z$ is sampled using the re-parametrization trick \cite{Kingma2019}. We add a \textit{Kullback-Leibler} loss to assure that the distribution of the latent representation approximates a \textit{Gaussian} distribution. 
+The output of the phonetic encoder is piped into a bi-directional recurrent neural network \cite{schuster1997,graves2005} in order to get a representation independent of time. The last output of the recurrent neural network of both, forward and reverse passes (represented in equations \ref{eq:rnn1} and \ref{eq:rnn2} as $\mathbf{o_f}$ and $\mathbf{o_r}$, respectively), are  concatenated to form a fixed-size phonetic representation $[\mathbf{o_f}, \mathbf{o_r}]$. That vector is concatenated with a vector of free parameters $\mathbf{v_f}$ and the result is passed through two stacked dense layers to form the parameters of the residual latent distribution (as shown in equation \ref{eq:residual}, where $f$ represents the \textit{ReLU} activation function). The $h_{residual}$ vector is split in two vectors $h_{residual}^{\mu}$ and $h_{residual}^{\sigma}$ from where a latent vector $z$ is sampled using the re-parametrization trick \cite{kingma2019}. We add a \textit{Kullback-Leibler} loss to assure that the distribution of the latent representation approximates a \textit{Gaussian} distribution.
 
 \begin{equation}
  \label{eq:rnn1}
@@ -72,13 +72,13 @@ The output of the phonetic encoder is piped into a bi-directional recurrent neur
 
 \section{Experiments}
  We have used a combination of two internal datasets to train the models, one of them containing 2860 non-professional speakers, with 200 utterances per speaker on average, and the other containing 10 professional speakers, with 13,000 studio-recorded utterances per speaker – totaling to 2870 speakers and more than 700,000 utterances. We process audio utterances at 16kHz and extract 80 dimensional mel-spectrograms. We define a frame as a $50ms$ sequence, with an overlap of $12.5ms$. We used the Universal Neural vocoder to synthesize the wav samples \cite{lorenzotrueba2019}. The linguistic features have been extracted using an internal linguistic front-end which takes the text as input and extracts the phonemes, that are used as input for the model. The speaker embedding, the free parameters and the residual distribution parameters $\mu$ and $\sigma$ vectors were defined to have a length of 192 elements.
- 
+
  We have trained both models on one million batches, with a batch size of 24. Then we synthesized a set of 50 unseen sentences for each of the 2870 speakers. The syntheses have been evaluated in 3 ways: intelligibility, distinctiveness and prosody variability.
- 
+
  Additionally, we sampled 50 speakers randomly from the pool of 2870 speakers and generated interpolations between all the possible pairs, in order to study how the proposed model and the baseline behave in this setting.
- 
+
  \subsection{Intelligibility}
-We used the \textit{AWS transcribe} system to transcribe each of the syntheses, and then measure the Word Error Rate (\textit{WER}) between the target sentence and the transcription \cite{Uday2019}. These metrics are aggregated as the average \textit{WER} per speaker. We achieved a median Word Error Rate of $8.5\%$ in the baseline, and $8.3\%$ in the proposed architecture. Although significative, this difference is very small, thus we can conclude that both models are roughly equivalent in terms of intelligibility. 
+We used the \textit{AWS transcribe} system to transcribe each of the syntheses, and then measure the Word Error Rate (\textit{WER}) between the target sentence and the transcription \cite{uday2019}. These metrics are aggregated as the average \textit{WER} per speaker. We achieved a median Word Error Rate of $8.5\%$ in the baseline, and $8.3\%$ in the proposed architecture. Although significative, this difference is very small, thus we can conclude that both models are roughly equivalent in terms of intelligibility.
 
 
 % TODO: \usepackage{graphicx} required
@@ -109,11 +109,11 @@ To measure how distinct the synthesized speakers are, we use our internal \texti
 		\textbf{Threshold} & \textbf{FAR-Baseline model} & \textbf{FAR-Proposed model} \\
 		\midrule
 		85\% & 31.49\% & 30.27\% \\
-		
+
 		90\% & 29.50\% & 28.21\% \\
-		
+
 		95\% & 26.23\% & 24.77\% \\
-		
+
 		99\% & 19.05\% & 16.93\% \\
 		\bottomrule
 	\end{tabular}
@@ -133,7 +133,7 @@ To measure how much prosody and quality variance the new model introduces with r
 	\label{fig:wilcoxon}
 \end{figure}
 
-	
+
 \begin{table*}
 	\footnotesize
 		\centering
@@ -154,12 +154,12 @@ To measure how much prosody and quality variance the new model introduces with r
 	\end{tabular}
 	\label{tab:metrics}
 \end{table*}
-	
+
 For this experiment, we have picked 50 speakers and 50 sentences. Then, 30 samples were synthesized for every speaker-sentence pair varying the random seed, so different latent vectors are drawn from the latent distributions in each repetition. We repeat this procedure four times: (1) with the baseline model, (2) with the proposed model multiplying the $\sigma$ parameter of the speaker embedding distribution by zero (so that the latent vector becomes the mean of the speaker embedding latent distribution), (3) with the proposed model multiplying the $\sigma$ parameter of the residual distribution by zero, and (4) allowing sampling from both branches in the proposed model. We then compare the syntheses of (1) vs (2), (1) vs (3) and (1) vs (4) .
 
 For the comparison, as we are interested to measure differences of variance for the variables defined in the table, we first use \textit{bootstrap} to approximate the variance distribution for every variable in every speaker-sentence pair, and then we run a one-way \textit{Wilcoxon Signed-Rank} sum test between the groups. We use a significance level of $\alpha=5\%$ to which we apply the \textit{Bonferroni} correction ($\alpha=0.05/2500=0.002\%$). The results of the tests are summarized in the figure \ref{fig:wilcoxon}.
 
-We have informally observed by listening to the syntheses that when we sample from the residual distribution (keeping the speaker embedding distribution constant), the variations in the syntheses are related with prosody aspects like the speaking rate, syllable duration or intonation, keeping, the speaker identity is untouched. When sampling from the speaker embedding distribution, we notice small variations on the speaker identity. 
+We have informally observed by listening to the syntheses that when we sample from the residual distribution (keeping the speaker embedding distribution constant), the variations in the syntheses are related with prosody aspects like the speaking rate, syllable duration or intonation, keeping, the speaker identity is untouched. When sampling from the speaker embedding distribution, we notice small variations on the speaker identity.
 
 
 
@@ -169,8 +169,8 @@ We have tested the proposed model and the baseline using interpolated speakers t
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.94\linewidth]{tts/images/far_svps}
-	
-	
+
+
 	\includegraphics[width=0.94\linewidth]{tts/images/wer_svps}
 	\caption{Top: False Acceptance Rate distribution at different speaker verification thresholds, for all the interpolated speakers. Bottom: speaker intelligibility of the baseline and residual models, measured as Word Error Rate of the target and the transcribed synthesis, showing a slightly smaller error for the baseline architecture (Wilcoxon's $p=5.2263\cdot 10^{-6}$)}
 	\label{fig:svps}
@@ -189,6 +189,6 @@ From the intelligibility perspective, the baseline shows an average WER of $6.42
 We introduced a new TTS architecture that allows increasing the prosody variance of a multi-speaker TTS system by learning the residual prosody into a new latent distribution. We showed that by sampling from the residual and normalized speaker latent distribution the model produces syntheses with significantly different prosodies as measured by a set of quantitative metrics. The inclusion of the residual distribution also enables removing the reference spectrogram dependency. This does not only solve potential speaker leakage issues but also allows for a faster and potentially cheaper inference, given that the model does not depend on a voice production system to work.
 
 
-Finally, the normalization of the speaker embedding latent space allows for better speaker interpolation when compared with the baseline model, thus producing more diverse and unseen synthetic speakers. 
+Finally, the normalization of the speaker embedding latent space allows for better speaker interpolation when compared with the baseline model, thus producing more diverse and unseen synthetic speakers.
 
 
