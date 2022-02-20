@@ -1,8 +1,9 @@
-\documentclass[10pt,a4paper,titlepage]{book}
+\documentclass[10pt,a4paper,titlepage,table]{book}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[english]{babel}
 \usepackage{amsmath}
+\usepackage[dvipsnames, table, svgnames]{xcolor}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
@@ -16,7 +17,21 @@
 % define quotes
 \newcommand{\chapquote}[3]{\begin{quotation} \textit{#1} \end{quotation} \begin{flushright} - #2, \textit{#3}\end{flushright} }
 
+% modulus dependencies
+\usepackage{subcaption,siunitx,booktabs}
+\usepackage{multirow}
+\usepackage{tabularx,booktabs} 
+%\usepackage{apalike}
+\usepackage{scrextend}
+\usepackage{tablefootnote}
+\usepackage{url}
+\def\UrlBreaks{\do\/\do-}
+\usepackage{breakurl}
+\usepackage[breaklinks]{hyperref}
+\usepackage{makecell}
 
+% distillation dependencies
+\usepackage{adjustbox}
 
 
 \author{Iván Vallés Pérez}
@@ -29,6 +44,11 @@
 
 \include{chapter1/chapter1}
 \include{chapter2/chapter2}
+\include{modulus/modulus}
+\include{distillation/distillation}
+\include{salesforecast/salesforecast}
+\include{kws/kws}
+\include{tts/tts}
 
 \bibliography{bibliography.bib}
 \bibliographystyle{amsplain}
