@@ -1,8 +1,9 @@
 %!TEX root = ../thesis.tex
-\chapter{Multispeaker Text-to-speech} \label{ch:tts}
+\chapter{Multispeaker text-to-speech modeling} \label{ch:tts}
 
-Text-to-speech systems recently achieved almost indistinguishable quality from human speech. However, the prosody of those systems is generally flatter than natural speech, producing samples with low expressiveness. Disentanglement of speaker id and prosody is crucial in text-to-speech systems to improve on naturalness and produce more variable syntheses. This paper proposes a new neural text-to-speech model that approaches the disentanglement problem by conditioning a \textit{Tacotron2}-like architecture on flow-normalized speaker embeddings, and by substituting the reference encoder with a new learned latent distribution responsible for modeling the intra-sentence variability due to the prosody. By removing the reference encoder dependency, the speaker-leakage problem typically happening in this kind of systems disappears, producing more distinctive syntheses at inference time. The new model achieves significantly higher prosody variance than the baseline in a set of quantitative prosody features, as well as higher speaker distinctiveness, without decreasing the speaker intelligibility. Finally, we observe that the normalized speaker embeddings enable much richer speaker interpolations, substantially improving the distinctiveness of the new interpolated speakers.
+Text-to-speech systems recently achieved almost indistinguishable quality from human speech. However, the prosody of those systems is generally flatter than natural speech, producing samples with low expressiveness. Disentanglement of speaker id and prosody is crucial in text-to-speech systems to improve on naturalness and produce more variable syntheses. This study proposes a new neural text-to-speech model that approaches the disentanglement problem by conditioning a \textit{Tacotron2}-like architecture on flow-normalized speaker embeddings, and by substituting the reference encoder with a new learned latent distribution responsible for modeling the intra-sentence variability due to the prosody. By removing the reference encoder dependency, not only the speaker-leakage problem typically happening in this kind of systems disappears, producing more distinctive syntheses at inference time, but the system becomes much more lightweight, not depending on a production TTS system to be executed. This is a first step that enables low-resource on-device offline execution The new model achieves significantly higher prosody variance than the baseline in a set of quantitative prosody features, as well as higher speaker distinctiveness, without decreasing the speaker intelligibility. Finally, we observe that the normalized speaker embeddings enable much richer speaker interpolations, substantially improving the distinctiveness of the new interpolated speakers.
 
+ This research study has been made as part of the author's work at \textit{Alexa AI}, and has already been published in the procedings of the \textit{Interspeech} conference of 2021. The content of this chapter is almostidentical as the one of the manuscript, except some minor adaptions.
 
 \section{Introduction}
 In the last five years speech technologies have improved considerably. The text-to-speech (TTS hereafter) field has been largely benefited by the rise of deep learning \cite{Sisman2021}, which allowed these systems to achieve near-human performance at synthesizing speech that is almost indistinguishable from human's. One of the first achievements was \textit{WaveNet} \cite{vanderoord2016}, a neural vocoder based on dilated causal convolutions that was able to surpass its predecessors in naturalness in 2016. With the rise of the attention mechanism and its variants \cite{bahdanau2015,vaswani2017,chaudhari2019}, \textit{Tacotron} \cite{Wang2017} and \textit{Tacotron 2} \cite{Shen2018,liu2019b} proposed a sequence to sequence architecture as an end-to-end TTS solution. These models were able to map input text (or phonemes) to a spectrogram that, given the right neural vocoder (\textit{WaveNet} for instance), would be converted into a sequence of waveform samples.
@@ -84,7 +85,7 @@ We used the \textit{AWS transcribe} system to transcribe each of the syntheses, 
 % TODO: \usepackage{graphicx} required
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.95\linewidth]{tts/images/wer}
+	\includegraphics[width=0.7\linewidth]{tts/images/wer}
 	\caption{Speaker intelligibility of the baseline and residual models, measured as Word Error Rate of the target and the transcribed synthesis, showing a slightly smaller error for the proposed architecture (Wilcoxon's $p=0.0305$).}
 	\label{fig:wer}
 \end{figure}
@@ -95,7 +96,7 @@ To measure how distinct the synthesized speakers are, we use our internal \texti
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=.95\linewidth]{tts/images/far}
+	\includegraphics[width=.7\linewidth]{tts/images/far}
 	\caption{False Acceptance Rate distribution at different \textit{speaker verification model} thresholds.}
 	\label{fig:far}
 \end{figure}
@@ -166,12 +167,12 @@ We have informally observed by listening to the syntheses that when we sample fr
 \subsection{Speakers interpolation}
 We have tested the proposed model and the baseline using interpolated speakers to study how the speaker embedding normalization affects the intelligibility and distinctiveness of the new speakers. For that, 50 speakers have been chosen. We have interpolated all the pairs of speakers using polar interpolation, generating 1225 new voice profiles. We have synthesized 50 sentences using those new voices and then evaluated distinctiveness and intelligibility (see results in figure  \ref{fig:svps}).
 % TODO: \usepackage{graphicx} required
-\begin{figure}[h]
+\begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.94\linewidth]{tts/images/far_svps}
+	\includegraphics[width=0.7\linewidth]{tts/images/far_svps}
 
 
-	\includegraphics[width=0.94\linewidth]{tts/images/wer_svps}
+	\includegraphics[width=0.7\linewidth]{tts/images/wer_svps}
 	\caption{Top: False Acceptance Rate distribution at different speaker verification thresholds, for all the interpolated speakers. Bottom: speaker intelligibility of the baseline and residual models, measured as Word Error Rate of the target and the transcribed synthesis, showing a slightly smaller error for the baseline architecture (Wilcoxon's $p=5.2263\cdot 10^{-6}$)}
 	\label{fig:svps}
 \end{figure}

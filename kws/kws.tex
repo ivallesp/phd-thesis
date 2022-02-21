@@ -1,9 +1,10 @@
 %!TEX root = ../thesis.tex
-\chapter{Keyword Spotting with CNNs} \label{ch:kws}
+\chapter{Keyword Spotting with efficient convolutions} \label{ch:kws}
 
-\section{overview}
-Speech commands recognition is a very important task nowadays due to the increase of the global interest in personal assistants. The field of conversational agents is growing fast and there is an increasing need for algorithms that perform well in order to enhance natural interaction. In this work we show how we achieved state of the art results by adapting and tweaking the \textit{Xception} algorithm, published by François Chollet in 2017, which achieved outstanding results in several computer vision tasks. We obtained about 96\% accuracy when classifying audio clips belonging to 35 different categories, beating human performance at the most complex benchmarks proposed.
+\section{Overview}
+Speech commands recognition is a very important task nowadays due to the increase of the global interest in personal assistants. The field of conversational agents is growing fast and there is an increasing need for algorithms that perform well in order to enhance natural interaction. In this work we show how we achieved state of the art results by adapting and tweaking the \textit{Xception} algorithm, published by François Chollet in 2017, which achieved outstanding results in several computer vision tasks. This architecture is designed to exploit the computational benefits and efficiency of the \textit{depthwise-separable convolutions}, leading to a solution with significantly lower computational requirements than a regular convolutional neural network. We obtained about 96\% accuracy when classifying audio clips belonging to 35 different categories, beating human performance at the most complex benchmarks proposed.
 
+This study has been published in the proceedings of the \textit{European Symposium of Artificial Neural Networks} (ESANN 2021) \cite{valles2021a}. The content of this chapter is almost identical to the content of the manuscript, with minor modifications and adaptions. All the code used to generate the results presented in this chapter is included in a public repository \footnote{\url{https://github.com/ivallesp/Xception1d}}.
 
 \section{Introduction}
 The world of voice-activated virtual assistants is booming. Several giant technological companies, (such as Amazon, Google, Apple and Baidu) have already developed their version of a virtual assistant. There is a huge research community surrounding this field, potentially promoted by the recent growth of the artificial intelligence (AI) paradigm.
@@ -240,9 +241,9 @@ Besides the global results, Figure \ref{fig:boxplot35002} shows the precision an
 
 
 
-\begin{table}[ht]
+\begin{table}[h!]
 	\centering
-	\caption{Accuracy (mean $\pm$ standard deviation) obtained by the proposed solution on the different tasks compared to other algorithms (described in \cite{Andrade2018, McMahan2018, Warden2018,Zhang2017}) and compared to our measurement of human accuracy (through 4 manual evaluations). The results of best performing algorithms for each task have been highlighted in bold in each case. Results better than human performance (given a statistical significance level of $\alpha = 0.05$) have been tagged with a star mark (*).}
+	\caption{Accuracy (mean $\pm$ standard deviation) obtained by the proposed solution on the different tasks compared to other benchmark algorithms (described in \cite{Andrade2018, McMahan2018, Warden2018,Zhang2017}) and compared to our measurement of human accuracy (through 4 manual evaluations). The results of best performing algorithms for each task have been highlighted in bold in each case. Results better than human performance (given a statistical significance level of $\alpha = 0.05$) have been tagged with a star mark (*).}
 	\label{tab:comparative}
 
 
@@ -252,7 +253,7 @@ Besides the global results, Figure \ref{fig:boxplot35002} shows the precision an
 		\scalebox{0.75}{
 	\begin{tabular}{lcccccc}
 		\hline
-		 & Andrade et al.\cite{Andrade2018} & McMahan et al. \cite{McMahan2018}\footref{foot:max} & Warden \cite{Warden2018} & \textit{Xception-1d} & Human & p-value\footref{foot:ttest}      \\ \hline
+		 & Ref. \cite{Andrade2018} & Ref.  \cite{McMahan2018}\footref{foot:max} & Ref. \cite{Warden2018} & \textit{Xception-1d} & Human & p-value\footref{foot:ttest}      \\ \hline
 		35-words & 94.30 & 84.35 & - & \textbf{95.85 $\pm$ 0.12 *} & 94.15 $\pm$ 1.03  & $1.46\cdot 10^{-2}$\\
 		20-commands & 94.10 & 85.52 & - & \textbf{95.89 $\pm$ 0.06 *} & 94.56 $\pm$ 0.98  & $3.14\cdot 10^{-2}$\\
 		10-commands & 95.60 & - & 85.40 & \textbf{97.15 $\pm$ 0.03} & 97.22 $\pm$ 0.85 & $8.75\cdot 10^{-1}$\\
@@ -267,7 +268,7 @@ Besides the global results, Figure \ref{fig:boxplot35002} shows the precision an
 \scalebox{0.75}{
 \begin{tabular}{lcccccc}
 	\hline
-	            & Andrade et al. \cite{Andrade2018} & Zhang et al. \cite{Zhang2017}\footnote{the  best results obtained among all the trials performed by the autors have been selected \label{foot:max}} & Warden \cite{Warden2018} &           \textit{Xception-1d}           &     Human    & p-value \footnote{Student's t-test for the comparison of two means. $\alpha = 0.05$ \label{foot:ttest}} \\ \hline
+	            & Ref. \cite{Andrade2018} &   Ref. \cite{Zhang2017}\footnote{the  best results obtained among all the trials performed by the autors have been selected \label{foot:max}} & Ref. \cite{Warden2018} &           \textit{Xception-1d}           &     Human    & p-value \footnote{Student's t-test for the comparison of two means. $\alpha = 0.05$ \label{foot:ttest}} \\ \hline
 	35-words    &               93.90               &               -               &            -             & \textbf{95.85 $\pm$ 0.16 *} & 94.15 $\pm$ 1.03 & $1.50\cdot 10^{-2}$ \\
 	20-commands &               94.50               &               -               &            -             & \textbf{95.96 $\pm$ 0.16 *} & 94.56 $\pm$ 0.98 & $2.70\cdot 10^{-2}$\\
 	10-commands &               96.90               &             95.40             &          88.20           & \textbf{97.54 $\pm$ 0.08}  & 97.22 $\pm$ 0.85 & $4.84\cdot 10^{-1}$ \\
