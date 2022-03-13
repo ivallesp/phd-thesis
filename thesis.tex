@@ -10,6 +10,7 @@
 \usepackage{pgfplots}
 \usepackage{booktabs}
 
+
 % Remove PDF version warnings
 \pdfminorversion=7
 
@@ -39,6 +40,11 @@
 % Format titlepage date
 \usepackage{datetime}
 
+
+%\DeclareUnicodeCharacter{0301}{*************************************}
+\usepackage[backend=biber, style=apa, natbib=true]{biblatex}
+\addbibresource{bibliography.bib} %Imports bibliography file
+
 \author{Iván Vallés Pérez}
 \title{Contributions and applications to low resource deep learning modeling}
 \newdateformat{monthyeardate}{%
@@ -58,9 +64,8 @@
 \include{tts/tts}
 \include{conclusions/conclusions}
 
-\bibliography{bibliography.bib}
-\bibliographystyle{amsplain}
 
+\printbibliography
 
 
 \end{document}

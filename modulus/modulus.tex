@@ -2,17 +2,21 @@
 \chapter{The modulus as activation function} \label{ch:modulus}
 
 \section{Overview}
-In this chapter we propose a new non-monotonic activation function: the \textit{modulus}. The majority of the reported research on nonlinearities is focused on monotonic functions. We empirically demonstrate how by using the \textit{modulus} activation function on computer vision tasks the models generalize better than with other nonlinearities - up to a 15\% accuracy increase in \textit{CIFAR100} and 4\% in \textit{CIFAR10}, relative to the best of the benchmark activations tested. With the proposed activation function the vanishing gradient and dying neurons problems disappear, because the derivative of the activation function is always 1 or -1. The simplicity of the proposed function and its derivative make this solution specially suitable for \textit{TinyML} and other low resource applications.
+The idea of decreasing the size of neural networks has been studied since long time ago \autocite{lecun1989, hassibi1993, frankleC19}. Many applications may require to be efficient at training or at inference times, especially the models that need to be executed on mobile and embedded devices \autocite{ooko2021, zapico2021}. One of the most impressive examples is the wake word detection system of the \textit{Google} assistant, which was reported to be a neural network that only weights 14 kilobytes in size \autocite{warden2020}. This field is commonly known as \textit{TinyML} \autocite{han2022}, and it not only brings obvious energy consumption benefits but it can also be used to reduce the latency of the response of such systems because the devices would no longer need to query large cloud servers, removing the dependency on internet connections and allowing them to work offline. Furthermore, the common privacy concerns of machine learning applications \autocite{ha2019} can be easily diluted if all the sensible data collected are processed solely into the device.
 
-This work has been submited to a journal venue. The content of this chapter is almost identical to the article except for some minor adaptions. The code used along this work has been made available in a public repository\footnote{\url{https://github.com/ivallesp/abs}}.
+In this chapter we propose a new non-monotonic activation function -- the \textit{modulus}-- which simplicity makes it specially suitable for \textit{TinyML} and other low resource applications: the modulus and its derivative are simply bit-size operations. We empirically demonstrate how by using the \textit{modulus} activation function on computer vision tasks the models generalize better than with other nonlinearities - up to a 15\% accuracy increase in \textit{CIFAR100} and 4\% in \textit{CIFAR10}, relative to the best of the benchmark activations tested. With the proposed activation function the vanishing gradient and dying neurons problems disappear, because the derivative of the activation function is always either 1 or -1.
+
+
+
+The code used along this work has been made available in a public repository\footnote{\url{https://github.com/ivallesp/abs}}.
 
 
 \section{Introduction}
-As discussed in section \ref{sec:mlp}, the core piece of all deep learning models is the activation function. They enable the models to produce non-linear abstract representations when applying linear transformations in cascade \cite{Goodfellow2016}. The most common choice in modern deep learning models is the Rectified Linear Unit (\textit{ReLU}) \cite{nair2010}. Among other advantages, \textit{ReLU} nonlinearities allowed us to train deeper neural networks \cite{xu2015}.
+As discussed in section \ref{sec:mlp}, the core piece of all deep learning models is the activation function. They enable the models to produce non-linear abstract representations when applying linear transformations in cascade \autocite{Goodfellow2016}. The most common choice in modern deep learning models is the Rectified Linear Unit (\textit{ReLU}) \autocite{nair2010}. Among other advantages, \textit{ReLU} nonlinearities allowed us to train deeper neural networks \autocite{xu2015}.
 
-Apart from the \textit{ReLU} in the last years there have appeared many alternative activation functions. The following studies represent some of the most popular examples: \textit{Leaky-ReLU} and \textit{PR-ReLU} \cite{xu2015}, \textit{ELU} \cite{djork2016}, \textit{Swish} \cite{ramachandran2018}, \textit{SELU} \cite{klambauer2017}, \textit{F/PFLU} \cite{zhu2020}, \textit{RSigElu} \cite{Kilicarslan2021} etc. All those activation functions have the following properties in common: nonlinearity, continuity, differentiability and low computational cost (being \textit{Swish} the most computationally expensive option). The majority of the activation functions are monotonic, \textit{Swish} \cite{ramachandran2018}, \textit{GELU} \cite{hendrycks2016},  \textit{S-ReLU} \cite{Jin2016} and \textit{Mish} \cite{misra2019mish} are some of the most popular exceptions. Despite the large pool of alternatives, \textit{ReLU} still appears as the default choice in many applications due to its simplicity and low computational cost \cite{nair2010}.
+Apart from the \textit{ReLU} in the last years there have appeared many alternative activation functions. The following studies represent some of the most popular examples: \textit{Leaky-ReLU} and \textit{PR-ReLU} \autocite{xu2015}, \textit{ELU} \autocite{djork2016}, \textit{Swish} \autocite{ramachandran2018}, \textit{SELU} \autocite{klambauer2017}, \textit{F/PFLU} \autocite{zhu2020}, \textit{RSigElu} \autocite{Kilicarslan2021} etc. All those activation functions have the following properties in common: nonlinearity, continuity, differentiability and low computational cost (being \textit{Swish} the most computationally expensive option). The majority of the activation functions are monotonic, \textit{Swish} \autocite{ramachandran2018}, \textit{GELU} \autocite{hendrycks2016},  \textit{S-ReLU} \autocite{Jin2016} and \textit{Mish} \autocite{misra2019mish} are some of the most popular exceptions. Despite the large pool of alternatives, \textit{ReLU} still appears as the default choice in many applications due to its simplicity and low computational cost \autocite{nair2010}.
 
-We delve into the world of the non-monotonic nonlinearities. We propose the \textit{modulus} function (aka absolute value) as an activation function, and provide empirical evidence proving that this activation function allows deep learning models to converge to better solutions in \textit{CIFAR10}, \textit{CIFAR100} and \textit{MNIST} datasets. Compared with other modern non-monotonic nonlinearities such as \textit{Mish} \cite{misra2019mish}, \textit{PFLU} and \textit{FPFLU} \cite{zhu2020} or \textit{Swish}  \cite{ramachandran2018}, the \textit{modulus} has a very low computational cost (equivalent to \textit{ReLU}). This property makes the \textit{modulus} specially useful for \textit{TinyML} applications \cite{sanchez2020} and hardware neural networks \cite{Misra2010}.
+We delve into the world of the non-monotonic nonlinearities. We propose the \textit{modulus} function (aka absolute value) as an activation function, and provide empirical evidence proving that this activation function allows deep learning models to converge to better solutions in \textit{CIFAR10}, \textit{CIFAR100} and \textit{MNIST} datasets. Compared with other modern non-monotonic nonlinearities such as \textit{Mish} \autocite{misra2019mish}, \textit{PFLU} and \textit{FPFLU} \autocite{zhu2020} or \textit{Swish}  \autocite{ramachandran2018}, the \textit{modulus} has a very low computational cost (equivalent to \textit{ReLU}). This property makes the \textit{modulus} specially useful for \textit{TinyML} \autocite{sanchez2020} and hardware \autocite{Misra2010} applications.
 
 The contributions of this work are: (1) we propose the modulus as activation function, (2) the proposed function empirically shows significantly superior results in 75\% of our experiments, (3) we contribute to the new trend of non-monotonic activation functions with another example showing results in the same direction, (4) the simplicity of the modulus activation function makes it very suitable for hardware applications and \textit{TinyML}, and (5) we propose two smooth approximation to the \textit{modulus} function, one of them achieving even superior results than the original \textit{modulus}.
 
@@ -33,7 +37,7 @@ f'(x)= \left\{ \begin{array}{lcc}
 \end{array} \right.
 $$
 
-Notice that the \textit{modulus} function is differentiable everywhere except in $x = 0$. For practical purposes, we define $f'(0) = 1$ so that the derivative is defined for all the range of $x$ values, similar to the case of \textit{ReLU} \cite{Goodfellow2016}. See figure \ref{fig:activations}g for a graphical representation.
+Notice that the \textit{modulus} function is differentiable everywhere except in $x = 0$. For practical purposes, we define $f'(0) = 1$ so that the derivative is defined for all the range of $x$ values, similar to the case of \textit{ReLU} \autocite{Goodfellow2016}. See figure \ref{fig:activations}g for a graphical representation.
 
 
 \begin{figure}
@@ -43,24 +47,87 @@ Notice that the \textit{modulus} function is differentiable everywhere except in
 	\label{fig:activations}
 \end{figure}
 
-The \textit{modulus} activation function belongs, in essence, to the family of rectifier functions \cite{glorot2015} . In fact, it is equivalent to a \textit{Leaky-ReLU} with $\alpha=-1$. However \textit{Leaky-ReLU} was originally defined to take values of alpha strictly higher than 1 \cite{xu2015}. Furthermore, we empirically show that the \textit{modulus} achieves significantly superior results than the \textit{Leaky-ReLU}.
+The \textit{modulus} activation function belongs, in essence, to the family of rectifier functions \autocite{glorot2015} . In fact, it is equivalent to a \textit{Leaky-ReLU} with $\alpha=-1$. However \textit{Leaky-ReLU} was originally defined to take values of alpha strictly higher than 0 \autocite{xu2015}. Furthermore, we empirically show that the \textit{modulus} achieves significantly superior results than the \textit{Leaky-ReLU}.
 
-The benefit of this activation function with respect to the other rectifiers is that the norm of its gradient is constant ($||\nabla_x f|| = 1 \quad \forall x$). This property is desirable when optimizing the parameters of a neural network with gradient descent algorithms, as there are no input values for which the neuron saturates \cite{glorot2010} (i.e. values of x for which the gradient of the activation function is close to zero). This naturally removes the dying neurons \cite{lu2020} and vanishing gradient problems \cite{pascanu13, hochreiter1998, Hochreiter2001}.
+The benefit of this activation function with respect to the other rectifiers is that the norm of its gradient is constant ($||\nabla_x f|| = 1 \quad \forall x$). This property is desirable when optimizing the parameters of a neural network with gradient descent algorithms, as there are no input values for which the neuron saturates \autocite{glorot2010} (i.e. values of x for which the gradient of the activation function is close to zero). This naturally removes the dying neurons \autocite{lu2020} and vanishing gradient problems \autocite{pascanu13, hochreiter1998, Hochreiter2001}.
 
 \subsection{Smooth approximations of the modulus function}
 The \textit{modulus} function is not differentiable when $x=0$. To study if this property harms the performance of the models in any way, two alternative smooth approximations of the \textit{modulus} function have been tested as an additional experiment. See figure \ref{fig:activationssmooth} for a visual representation. The two approximations are defined below.
+
+
+\subsubsection{Quadratic approximation}
+We choose a fuzzy set approach to combine the modulus function with a quadratic function. For that, three membership functions are defined in figure \ref{fig:fuzzy} and equations \ref{eq:mulow}, \ref{eq:mumid}, \ref{eq:muhigh}.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.7\linewidth]{modulus/images/fuzzy}
+	\caption{Membership functions used to combine the quadratic and modulus functions.)}
+	\label{fig:fuzzy}
+\end{figure}
+
+\begin{equation}
+\label{eq:mulow}
+\mu^x_{\text{low}}= \left\{ \begin{array}{lcc}
+1 &   \text{if}  & x < -1 \\
+-x & \text{if}  & -1 \leq x < 0 \\
+0 &  \text{if} & x \geq 0
+\end{array}
+\right.
+\end{equation}
+
+\begin{equation}
+\label{eq:mumid}
+\mu^x_{\text{med}}= \left\{ \begin{array}{lcc}
+0 &   \text{if}  & x < -1 \\
+x+1 & \text{if}  & -1 \leq x < 0 \\
+1-x & \text{if}  & 0 \leq x < 1 \\
+0 &  \text{if} & x \geq 1
+\end{array}
+\right.
+\end{equation}
+
+\begin{equation}
+\label{eq:muhigh}
+\mu^x_{\text{high}}= \left\{ \begin{array}{lcc}
+0 &   \text{if}  & x < 0 \\
+x & \text{if}  & 0 \leq x < 1 \\
+1 &  \text{if} & x \geq 1
+\end{array}
+\right.
+\end{equation}
+
+Then we define $f^x_{\text{low}}=-x$, $f^x_{\text{med}}=x^2$ and $f^x_{\text{high}}=x$. If we combine these functions with the membership functions we get the following.
+
 \begin{itemize}
-	\item Quadratic approximation: referred subsequently as \textit{SoftModulusQ} and defined below (full derivation in the appendix).
-	$$
-	f(x)= \left\{ \begin{array}{lcc}
-	x^2 \cdot (2-|x|) &  \text{if} & |x| \leq 1 \\
-	|x| &   \text{if}  & |x| > 1
-	\end{array}
-	\right.
-	$$
-	\item Hyperbolic tangent approximation: referred subsequently as \textit{SoftModulusT} and defined below. Starting from the modulus function $f(x)=sgn(x)\cdot x$, we approximate the $sgn$ function as follows $sgn(x) \approx \tanh(x/\beta)$, where $\beta \in [0, 1]$ is a tunable hyperparameter that controls how acute the ``V'' transition is. The smaller the $\beta$, the closest the approximation is to the \textit{modulus}. We used a value of $\beta=0.01$ in all the models we trained.
-	$$f(x) = x \cdot \tanh(x/\beta)$$
+	\item For $x < -1$: we get $\hat{f}(x)=\frac{f^x_{\text{low}} \cdot \mu^x_{\text{low}}}{\mu^x_{\text{low}}}=-x$
+
+	\item For $-1\leq x < 0$: we get $\hat{f}(x)=\frac{f^x_{\text{low}} \cdot \mu^x_{\text{low}} + f^x_{\text{med}} \cdot \mu^x_{\text{med}}}{\mu^x_{\text{low}} + \mu^x_{\text{med}}}=\frac{(x+1)x^2+(-x)(-x)}{1+x-x}=x^3 + 2x^2$
+
+	\item For $0\leq x < 1$: we get $\hat{f}(x)=\frac{f^x_{\text{med}} \cdot \mu^x_{\text{med}} + f^x_{\text{high}} \cdot \mu^x_{\text{high}}}{\mu^x_{\text{med}} + \mu^x_{\text{high}}}=\frac{(1-x)x^2+x\cdot x}{1-x+x}=-x^3 + 2x^2$
+
+	\item For $x \geq 1$: we get $\hat{f}(x)=\frac{f^x_{\text{high}} \cdot \mu^x_{\text{high}}}{\mu^x_{\text{high}}}=x$
 \end{itemize}
+
+Combining and simplifying all the above expressions we get the final \textit{SoftModulusQ} activation function.
+
+$$
+f(x)= \left\{ \begin{array}{lcc}
+x^2 \cdot (2-|x|) &  \text{if} & |x| \leq 1 \\
+|x| &   \text{if}  & |x| > 1
+\end{array}
+\right.
+$$
+
+
+
+
+We  subsequently refer to this approximation as \textit{SoftModulusQ}.
+
+\subsubsection{Hyperbolic tangent approximation}
+Starting from the modulus function $f(x)=sgn(x)\cdot x$, we approximate the $sgn$ function as follows $sgn(x) \approx \tanh(x/\beta)$, where $\beta \in [0, 1]$ is a tunable hyperparameter that controls how acute the ``V'' transition is. The smaller the $\beta$, the closest the approximation is to the \textit{modulus}. We used a value of $\beta=0.01$ in all the models we trained.
+	$$f(x) = x \cdot \tanh(x/\beta)$$
+
+In the rest of the chapter, we refer to this approximation as \textit{SoftModulusT}.
 
 % TODO: \usepackage{graphicx} required
 \begin{figure}[h!]
@@ -75,10 +142,10 @@ The following activation functions have been used as a benchmark to compare the 
 
 
 \begin{itemize}
-	\item \textit{Tanh}: the hyperbolic tangent has been one of the most popular choices (together with the \textit{sigmoid}), before \textit{ReLU} was proposed \cite{lecun2012}. Among many other desirable properties, its derivative is very simple: $(\tanh x)'=1-\tanh^2 x$. This property was very beneficial specially before automatic differentiation tools appeared. Besides, similar to our proposed activation function, the derivative can be easily calculated during forward pass and cached for the backward pass.
-	\item \textit{ReLU}: this activation function was published in 2010 as an alternative to train \textit{Restricted Boltzman Machines} \cite{nair2010}. It is defined as $f(x) = \max(0,x)$. It allowed training deeper neural networks by solving the vanishing gradient problems typically happening with saturating activation functions. As it can be seen in the formula, ReLU outputs zero if the input is negative. This brings sparsity to the non-linear representation, at the cost of potentially finding optimization problems due to the fact that the derivative when $x<0$ is zero (dying neurons, for instance).
-	\item \textit{Leaky-ReLU}: the \textit{Leaky-ReLU} \cite{xu2015} attempted to solve the problem known as \textit{dying neurons} in the \textit{ReLUs} by adding a small linear term in the negative side of $x$: $f(x) = \max(x/\beta, x)$, where $\beta$ is a hyperparameter to be tuned: $\beta>1$.
-	\item \textit{ELU}: this is a smooth version of \textit{ReLU} \cite{djork2016} that approaches asymptotically to -1 when $x=-\inf$. Unlike ReLUs, it is differentiable everywhere and can produce negative values. This activation function is formally defined as follows. $\beta$ is a tunable hyperparameter.
+	\item \textit{Tanh}: the hyperbolic tangent has been one of the most popular choices (together with the \textit{sigmoid}), before \textit{ReLU} was proposed \autocite{lecun2012}. Among many other desirable properties, its derivative is very simple: $(\tanh x)'=1-\tanh^2 x$. This property was very beneficial specially before automatic differentiation tools appeared. Besides, similar to our proposed activation function, the derivative can be easily calculated during forward pass and cached for the backward pass.
+	\item \textit{ReLU}: this activation function was published in 2010 as an alternative to train \textit{Restricted Boltzman Machines} \autocite{nair2010}. It is defined as $f(x) = \max(0,x)$. It allowed training deeper neural networks by solving the vanishing gradient problems typically happening with saturating activation functions. As it can be seen in the formula, ReLU outputs zero if the input is negative. This brings sparsity to the non-linear representation, at the cost of potentially finding optimization problems due to the fact that the derivative when $x<0$ is zero (dying neurons, for instance).
+	\item \textit{Leaky-ReLU}: the \textit{Leaky-ReLU} \autocite{xu2015} attempted to solve the problem known as \textit{dying neurons} in the \textit{ReLUs} by adding a small linear term in the negative side of $x$: $f(x) = \max(x/\beta, x)$, where $\beta$ is a hyperparameter to be tuned: $\beta>1$.
+	\item \textit{ELU}: this is a smooth version of \textit{ReLU} \autocite{djork2016} that approaches asymptotically to -1 when $x=-\inf$. Unlike ReLUs, it is differentiable everywhere and can produce negative values. This activation function is formally defined as follows. $\beta$ is a tunable hyperparameter.
 	$$
 	f(x)= \left\{ \begin{array}{lcc}
 		x &   \text{if}  & x > 0 \\
@@ -87,8 +154,8 @@ The following activation functions have been used as a benchmark to compare the 
 	\right.
 	$$
 
-	\item \textit{Swish}: this is one of the few non-monotonic activation functions formally published \cite{ramachandran2018}. It gained its popularity because it showed promising results in multiple applications. It is defined as $f(x) = x \cdot \text{sigmoid}(\beta x)$, where $\beta$ is a hyperparameter to be tuned.
-	\item \textit{Mish}: this is a smooth, non-monotonic and self-regularized activation function, similar to swish, showing superior performance in different benchmarks \cite{misra2019mish}. It is defined as $f(x) = x \tanh (\text{softplus} (x))$, where $\text{softplus} (x) = \log(1+e^x)$ \cite{dugas2001}.
+	\item \textit{Swish}: this is one of the few non-monotonic activation functions formally published \autocite{ramachandran2018}. It gained its popularity because it showed promising results in multiple applications. It is defined as $f(x) = x \cdot \text{sigmoid}(\beta x)$, where $\beta$ is a hyperparameter to be tuned.
+	\item \textit{Mish}: this is a smooth, non-monotonic and self-regularized activation function, similar to swish, showing superior performance in different benchmarks \autocite{misra2019mish}. It is defined as $f(x) = x \tanh \left[\text{softplus} (x)\right]$, where $\text{softplus} (x) = \log(1+e^x)$ \autocite{dugas2001}.
 	\item \textit{PFLU}: the Power Function Linear Unit (PFLU) is a non-monotonic activation function published on 2020 that showed good performance in convolutional architectures. It is defined as follows: $f(x) = x \cdot \frac{1}{2} \left( 1 + \frac{x}{\sqrt{1+x^2}} \right)$.
 
 \end{itemize}
@@ -97,7 +164,7 @@ The following activation functions have been used as a benchmark to compare the 
 \subsection{Setup}
 
 \begin{table}[h] \small
-	\caption{Deep learning architectures used to experiment with different activations. In the dense layers row, the output size has been represented as $C$. The Fully connected architecture (\textit{FC}) is a multilayer perceptron with 2 hidden layers + the output layer. The \textit{Conv2} and \textit{Conv6} architectures are shallow variants of \textit{VGG} described here: \cite{simonyan2015}. The last pooling layer of the \textit{VGG-16} original architecture has been trimmed in order to allow this model to work with smaller image sizes.}
+	\caption{Deep learning architectures used to experiment with different activations. In the dense layers row, the output size has been represented as $C$. The Fully connected architecture (\textit{FC}) is a multilayer perceptron with 2 hidden layers + the output layer. The \textit{Conv2} and \textit{Conv6} architectures are shallow variants of \textit{VGG} described here: \autocite{simonyan2015}. The last pooling layer of the \textit{VGG-16} original architecture has been trimmed in order to allow this model to work with smaller image sizes.}
 	\setcellgapes{3pt}\makegapedcells
 	\begin{tabular}[t]{lllll}
 		\toprule
@@ -113,11 +180,11 @@ The following activation functions have been used as a benchmark to compare the 
 	\vspace{20pt}
 \end{table}
 
-For the following experiments we have used \textit{CIFAR10}, \textit{CIFAR100} \cite{krizhevsky09} and \textit{MNIST} \cite{lecun2010} datasets. \textit{CIFAR10} and \textit{CIFAR100} images are labeled into 10 and 100 classes, respectively. They are of size 32x32 and full color. In both cases, the data sets contain 50,000 images for training and 10,000 images for testing purposes. \textit{MNIST} images belong to one of 10 classes and are in grey scale and 28x28 size. \textit{MNIST} comes with 50,000 imags for training and 10,000 images for testing purposes.
+For the following experiments we have used \textit{CIFAR10}, \textit{CIFAR100} \autocite{krizhevsky09} and \textit{MNIST} \autocite{lecun2010} datasets. \textit{CIFAR10} and \textit{CIFAR100} images are labeled into 10 and 100 classes, respectively. They are of size 32x32 and full color. In both cases, the data sets contain 50,000 images for training and 10,000 images for testing purposes. \textit{MNIST} images belong to one of 10 classes and are in grey scale and 28x28 size. \textit{MNIST} comes with 50,000 images for training and 10,000 images for testing purposes.
 
-The images of the datasets have been normalized so that the minimum and the maximum values are -1 and 1. We have kept untouched the default train/test split provided by \textit{Pytorch} \cite{Paszke2019}, in order to facilitate future potential reproducibility and benchmarking efforts.
+The images of the datasets have been normalized so that the minimum and the maximum values are -1 and 1. We have kept untouched the default train/test split provided by \textit{Pytorch} \autocite{Paszke2019}, in order to facilitate future potential reproducibility and benchmarking efforts.
 
-Four different architectures have been used to test the performance of the \textit{modulus} activation function against the other nonlinearities. These architectures are described in Table \ref{tab:architectures}. The architectures choice has been inspired on the \textit{Lottery Ticket Hypothesis} paper \cite{frankleC19}.
+Four different architectures have been used to test the performance of the \textit{modulus} activation function against the other nonlinearities. These architectures are described in Table \ref{tab:architectures}. The architectures choice has been inspired on the \textit{Lottery Ticket Hypothesis} paper \autocite{frankleC19}.
 
 
 
@@ -178,7 +245,7 @@ Four different architectures have been used to test the performance of the \text
 \end{figure}
 
 
-We have followed the same experimental setup across models, activations and datasets. All the networks have been trained for 100 epochs, and the best accuracy of each run has been recorded. Each run has been repeated 30 times with different random weight initializations. No \textit{dropout} \cite{srivastava2014} nor \textit{batch normalization} \cite{ioffe2015} have been used. We used \textit{Adam} \cite{kingma14} as optimizer, with a learning rate of $10^{-4}$, a \textit{gradual warmup} \cite{gotmare2018} during the first 5 epochs starting from $10^{-5}$, and a \textit{cosine annealing} \cite{loshchilov2017} with a target learning rate of $10^{-6}$ in the last epoch. We used \textit{Python} 3.7.3, \textit{Pytorch} 1.7.1 and  \textit{TorchVision} 0.8.2. The code used in this work can be found in the url included in the footnote \footnote{\url{https://github.com/ivallesp/abs}}.
+We have followed the same experimental setup across models, activations and datasets. All the networks have been trained for 100 epochs, and the best accuracy of each run has been recorded. Each run has been repeated 30 times with different random weight initializations. No \textit{dropout} \autocite{srivastava2014} nor \textit{batch normalization} \autocite{ioffe2015} have been used. We used \textit{Adam} \autocite{kingma14} as optimizer, with a learning rate of $10^{-4}$, a \textit{gradual warmup} \autocite{gotmare2018} during the first 5 epochs starting from $10^{-5}$, and a \textit{cosine annealing} \autocite{loshchilov2017} with a target learning rate of $10^{-6}$ in the last epoch. We used \textit{Python} 3.7.3, \textit{Pytorch} 1.7.1 and  \textit{TorchVision} 0.8.2. The code used in this work can be found in the url included in the footnote \footnote{\url{https://github.com/ivallesp/abs}}.
 
 
 \subsection{Classification performance}
@@ -226,68 +293,5 @@ We have shown how the new \textit{modulus} activation function outperforms the b
 The results of this study motivate exploring non-monotonic activation functions as alternatives to the classical choices.
 
 
-
-\section*{Appendix: SoftModulusQ derivation}
-We chose a fuzzy set approach to combine the modulus function with a quadratic function. For that, three membership functions are defined in figure \ref{fig:fuzzy} and equations \ref{eq:mulow}, \ref{eq:mumid}, \ref{eq:muhigh}.
-% TODO: \usepackage{graphicx} required
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=0.7\linewidth]{modulus/images/fuzzy}
-	\caption{Membership functions used to combine the quadratic and modulus functions.)}
-	\label{fig:fuzzy}
-\end{figure}
-
-\begin{equation}
-	\label{eq:mulow}
-	\mu^x_{\text{low}}= \left\{ \begin{array}{lcc}
-		1 &   \text{if}  & x < -1 \\
-		-x & \text{if}  & -1 \leq x < 0 \\
-		0 &  \text{if} & x \geq 0
-		\end{array}
-		\right.
-\end{equation}
-
-\begin{equation}
-	\label{eq:mumid}
-	\mu^x_{\text{med}}= \left\{ \begin{array}{lcc}
-		0 &   \text{if}  & x < -1 \\
-		x+1 & \text{if}  & -1 \leq x < 0 \\
-		1-x & \text{if}  & 0 \leq x < 1 \\
-		0 &  \text{if} & x \geq 1
-		\end{array}
-		\right.
-\end{equation}
-
-\begin{equation}
-	\label{eq:muhigh}
-	\mu^x_{\text{high}}= \left\{ \begin{array}{lcc}
-	0 &   \text{if}  & x < 0 \\
-	x & \text{if}  & 0 \leq x < 1 \\
-	1 &  \text{if} & x \geq 1
-	\end{array}
-	\right.
-\end{equation}
-
-Then we define $f^x_{\text{low}}=-x$, $f^x_{\text{med}}=x^2$ and $f^x_{\text{high}}=x$. If we combine these functions with the membership functions we get the following.
-
-\begin{itemize}
-	\item For $x < -1$: we get $\hat{f}(x)=\frac{f^x_{\text{low}} \cdot \mu^x_{\text{low}}}{\mu^x_{\text{low}}}=-x$
-
-	\item For $-1\leq x < 0$: we get $\hat{f}(x)=\frac{f^x_{\text{low}} \cdot \mu^x_{\text{low}} + f^x_{\text{med}} \cdot \mu^x_{\text{med}}}{\mu^x_{\text{low}} + \mu^x_{\text{med}}}=\frac{(x+1)x^2+(-x)(-x)}{1+x-x}=x^3 + 2x^2$
-
-	\item For $0\leq x < 1$: we get $\hat{f}(x)=\frac{f^x_{\text{med}} \cdot \mu^x_{\text{med}} + f^x_{\text{high}} \cdot \mu^x_{\text{high}}}{\mu^x_{\text{med}} + \mu^x_{\text{high}}}=\frac{(1-x)x^2+x\cdot x}{1-x+x}=-x^3 + 2x^2$
-
-	\item For $x \geq 1$: we get $\hat{f}(x)=\frac{f^x_{\text{high}} \cdot \mu^x_{\text{high}}}{\mu^x_{\text{high}}}=x$
-\end{itemize}
-
-Combining and simplifying all the above expressions we get the final \textit{SoftModulusQ} activation function.
-
-$$
-f(x)= \left\{ \begin{array}{lcc}
-x^2 \cdot (2-|x|) &  \text{if} & |x| \leq 1 \\
-|x| &   \text{if}  & |x| > 1
-\end{array}
-\right.
-$$
 
 
