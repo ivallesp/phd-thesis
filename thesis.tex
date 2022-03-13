@@ -33,14 +33,43 @@
 \usepackage{breakurl}
 \usepackage[breaklinks]{hyperref}
 \usepackage{makecell}
-
 % distillation dependencies
 \usepackage{adjustbox}
-
 % Format titlepage date
 \usepackage{datetime}
+\usepackage{fancyhdr}
 
+% Define style of the content previous to the chapters
+\pagestyle{fancy}
+\fancypagestyle{Preamble}{%
+	\fancyhead{} %Clean headers
+	\fancyhead[LO]{\slshape\nouppercase{\leftmark}}
+	\fancyhead[LE]{\thepage}
+	\fancyhead[RE]{}
+	\fancyhead[RO]{\thepage}
+	\fancyfoot{} %Clean headers
+	\renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{ {##1}}}{}}
+}
 
+% Define the content of the body
+\pagestyle{fancy}
+\fancypagestyle{MyStyle}{%
+	\fancyhead{} %Clean headers
+	\fancyhead[LO]{\slshape\nouppercase{\leftmark}}
+	\fancyhead[LE]{\thepage}
+	\fancyhead[RE]{\chaptername\ \thechapter}
+	\fancyhead[RO]{\thepage}
+	\fancyfoot{} %Clean headers
+	\renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{ {##1}}}{}}
+}
+
+% Remove the header in the chapter pages
+\fancypagestyle{plain}{%
+	\renewcommand{\headrulewidth}{0pt}%
+	\fancyhf{}%
+}
+
+% Configure the bibliography
 %\DeclareUnicodeCharacter{0301}{*************************************}
 \usepackage[backend=biber, style=apa, natbib=true]{biblatex}
 \addbibresource{bibliography.bib} %Imports bibliography file
@@ -51,10 +80,15 @@
 	\monthname[\THEMONTH], \THEYEAR}
 
 \begin{document}
+
+
 \include{titlepage/titlepage}
+\pagestyle{Preamble}
 
 \tableofcontents
+\clearpage
 
+\pagestyle{MyStyle}
 \include{chapter1/chapter1}
 \include{chapter2/chapter2}
 \include{modulus/modulus}
