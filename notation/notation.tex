@@ -1,42 +1,62 @@
 %!TEX root = ../thesis.tex
 \chapter*{Notation} \label{ch:notation}
-We tried to follow a common notation throughout this dissertation. This chapter provides a brief reference of all the conventions followed. 
-
+This section summarizes the notation conventions followed in this dissertation. As a general note, bold lowercase symbols have been used to denote vectors, while bold uppercase symbols represent matrices. Non bold symbols have been used to represent scalars. 
 
 \section*{Data}
 
 \begin{labeling}{alligator}
-	\item [$\mathbf{X}$] a matrix with shape $N \times D$ containing $N$ input row vectors, where each vector is represented as $\{\mathbf{x_1},...,\mathbf{x_i},...,\mathbf{x_N}\}$.
+	\item [$\mathbf{X}$] a matrix with shape $N \times D$ containing $N$ input row vectors, represented as $\{\mathbf{x_1},...,\mathbf{x_i},...,\mathbf{x_N}\}$, where each vector $\mathbf{x_i} \in \mathbb{R}^D$.
 	\item [$\mathbf{x_i}$] a vector of length $D$ where each element represents a particular feature (e.g. age, weight, or IQ of a person).
-	\item [$\mathbf{Y}$] a matrix with shape $N \times K$ containing desired output vectors row $\{\mathbf{y_1},...,\mathbf{y_i},...,\mathbf{y_K}\}$.
+	\item [$\mathbf{Y}$] a matrix with shape $N \times K$ containing desired output vectors row $\{\mathbf{y_1},...,\mathbf{y_i},...,\mathbf{y_K}\}$, where each output vector $\mathbf{y_i} \in \mathbb{R}^K$.
 	\item [$\mathbf{y_i}$]  a vector of length $K$ where each element is one of the scalar desired outputs (e.g. the probability of having a high income in a 5 years time span).
-	\item [$\mathbf{T}$] a data set  of examples with inputs and desired outputs for supervised learning tasks, composed of a set of pairs of vectors from $\mathbf{X}$ and $\mathbf{Y}$ matrices grouped as follows: $\{(\mathbf{x_1}, \mathbf{y_1})...,(\mathbf{x_i}, \mathbf{y_i}),...,(\mathbf{x_N}, \mathbf{y_N})\}$, where each tuple represents a training example.
-	\item [$\mathbf{U}$] a data set of examples for unsupervised learning tasks, composed of a set of input vectors from $\mathbf{X}$ disposed as follows: $\{\mathbf{x_1},...,\mathbf{x_i},...,\mathbf{x_N}\}$, where each element represents a training example.
+	\item [$\mathbf{T}$] a data set  of examples with inputs and desired outputs for supervised learning tasks, composed of a set of pairs of vectors from $\mathbf{X}$ and $\mathbf{Y}$, grouped as follows: $\{(\mathbf{x_1}, \mathbf{y_1})...,(\mathbf{x_i}, \mathbf{y_i}),...,(\mathbf{x_N}, \mathbf{y_N})\}$, where each tuple represents a training example.
+	\item [$\mathbf{U}$] a data set of examples for unsupervised learning tasks, composed of a set of input vectors from $\mathbf{X}$, disposed as follows: $\{\mathbf{x_1},...,\mathbf{x_i},...,\mathbf{x_N}\}$, where each element $\mathbf{x_i} \in \mathbb{R}^D$ represents a training example.
+	\item [$N$] Number of examples in a dataset.
+	\item [$D$]  Number of features in a dataset or in a feature vector.
+	\item [$K$] Dimensionality of a multivariate desired output variable of a dataset.
+	\item [$T$] Length of a time series ($\mathbf{x}^{(1)}, ..., \mathbf{x}^{(t)}, ..., \mathbf{x}^{(T)}$), where $\mathbf{x}^{(t)} \in \mathbb{R}^D$ and the superindex refers to the time step the observation belongs to.
+	\item [$\mathbf{C}$] Set of possible labels associated with the examples of a of a data set, where $||C||$ is used to represent the cardinality of the set.
 \end{labeling}
 
 \section*{Neural networks and machine learning}
 
 \begin{labeling}{alligator}
-	\item [$\mathbf{\theta}$] vector containing all the parameters of a neural netword model.
+	\item [$\mathbf{\hat{y}}$] predicted response variable, generally the output of a machine learning model.
+	\item [$\mathbf{z}$] vector representing a variable in a latent space.
+	\item [$b$] bias term of a neuron.
+	\item [$\mathbf{\theta}$] vector containing all the parameters of a neural network model.
 	\item [$f_\mathbf{\theta}(\cdot)$] neural network model with parameters $\mathbf{\theta}$.
-	\item [$J(\cdot, \cdot)$] cost function, i.e. differentiable function quantifying the error to be minimized, normally using gradient descent.
-	\item [$\mathbf{W}$] weights matrix of a neural network layer, which scalar components are denoted by $w_{ij}$.
+	\item [$J(\cdot, \cdot)$] cost function, i.e. function quantifying the error to be minimized, often using gradient descent.
+	\item [$\mathbf{W}, \mathbf{U}$] weight matrices of a neural network layer, which scalar components are denoted by $w_{ij}$.
 	\item[$g(\cdot)$] activation function.
-	\item[$G(\cdot)$] multi-layer Perceptron.
-	\item[$t$] optimization step.
+	\item[$G(\cdot)$] multi-layer \textit{Perceptron}.
+	\item{$\mathbf{S}$} feature map in a convolutional neural network, result of convolving an input $\mathbf{X}$ with a kernel $\mathbf{W}$.
+	\item[$t$] index that refers to time or sequence steps. Generally used for referring to  an optimization step or to a time series element.
 	\item[$\lambda$] learning rate.
 	\item[$m$] minibatch size.
 	\item[$L$] number of layers of a deep learning model.
 	\item[$\mathbf{h}$] output of a hidden layer.
+	\item[$\mathbf{a}$] the attention vector.
+	\item[$\mathbf{Q}, \mathbf{K}, \mathbf{V}$] the query, key and value matrices in the attention mechanism context, respectively.
+	\item[$d_k$]{the length of a sequence in the attention mechanism context.}
+	\item[$Nx$]{the number of blocks in a transformer.}
+	\item[$f_e, f_d$]{encoder and decoder networks of an autoencoder, respectively.}
+	\item[$p_\theta, q_\phi$]{encoder and decoder networks of a variational autoencoder, respectively, with parameter sets $\mathbf{\theta}$ and $\mathbf{\phi}$.}
+	\item[$\mathcal{L}$]{variational lower bound.}
+	\item[$f_g, f_d$]{generator and discriminator in the context of Generative Adversarial Networks.}
+	\item[$\mathcal{T}$] Temperature parameter of a \textit{softmax} operation.
 \end{labeling}
-
-
-\section*{Calculus}
 
 \section*{Others}
 \begin{labeling}{alligator}
-	\item [$H$] \textit{Heavyside} function.
+	\item [$D_{KL}$] {\textit{Kullback-Leibler} (KL) divergence between two distributions.}
+	\item [$p(\cdot)$]{probability distribution.}
+	\item [$H(\cdot)$] \textit{Heavyside} function.
 	\item [$\sigma(\cdot)$] \textit{Sigmoid} function.
-	\item [$\sigma(\tau)$] Hyperbolic tangent function ($\tanh(\cdot)$).
-	
+	\item [$\tau(\cdot)$] Hyperbolic tangent function ($\tanh(\cdot)$).
+	\item [$\mathrm{sgn}(\cdot)$] Sign function.
+	\item [$\odot$] {\textit{Hadamard} product (also known as element-wise multiplication)}.
+	\item [$\circ$] Composition operation.
+	\item [$\nabla_a f$] Gradient of function $f$ with respect to parameters $a$.
+
 \end{labeling}
