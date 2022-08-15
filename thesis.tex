@@ -10,9 +10,14 @@
 \usepackage{pgfplots}
 \usepackage{booktabs}
 
+% Prevent orphan headers
+\usepackage[nobottomtitles]{titlesec}
+
+% Typography refinements
+\usepackage{microtype}
 
 % Remove PDF version warnings
-\pdfminorversion=7
+%\pdfminorversion=7
 
 % define theorem
 \usepackage{mdframed}
@@ -20,7 +25,7 @@
 
 % define quotes
 \newcommand{\chapquote}[3]{\begin{quotation} \textit{#1} \end{quotation} \begin{flushright} - #2, \textit{#3}\end{flushright} }
-
+ 
 % modulus dependencies
 \usepackage{subcaption,siunitx,booktabs}
 \usepackage{multirow}
@@ -68,6 +73,10 @@
 	\renewcommand{\headrulewidth}{0pt}%
 	\fancyhf{}%
 }
+
+% Add column type Y for distillation paper
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
 
 % Configure the bibliography
 %\DeclareUnicodeCharacter{0301}{*************************************}

@@ -2,41 +2,29 @@
 \chapter{Keyword Spotting with efficient convolutions} \label{ch:kws}
 
 \section{Overview}
-Speech commands recognition is a very relevant task nowadays due to the increase of the global interest in personal assistants. The field of conversational agents is growing fast and there is an increasing need for algorithms that perform well in order to enhance natural interaction. In this work we show how we achieved state of the art results by adapting and tweaking the \textit{Xception} algorithm, published by François Chollet in 2017, which achieved outstanding results in several computer vision tasks. This architecture is designed to exploit the computational benefits and efficiency of the \textit{depthwise-separable convolutions}, leading to a solution with significantly lower computational requirements than a regular convolutional neural network. We obtained about 96\% accuracy when classifying audio clips belonging to 35 different categories, beating human performance at the most complex benchmarks proposed.
+Speech commands recognition is a very relevant task nowadays due to the increase of the global interest in personal assistants. The field of conversational agents is growing fast and there is an increasing need for algorithms that perform well in order to enhance natural interaction. This work shows state of the art results can be achieved by adapting and tweaking the \textit{Xception} algorithm \autocite{chollet2017}, which achieved outstanding results in several computer vision tasks. This architecture is designed to exploit the computational benefits and efficiency of the \textit{depthwise-separable convolutions}, leading to a solution with significantly lower computational requirements than a regular convolutional neural network. The solution obtained about 96\% accuracy when classifying audio clips belonging to 35 different categories, beating human performance at the most complex benchmarks proposed.
 
 This study has been published in the proceedings of the \textit{European Symposium of Artificial Neural Networks} (ESANN 2021) \autocite{valles2021a}. All the code used to generate the results presented in this chapter is included in a public repository \footnote{\url{https://github.com/ivallesp/Xception1d}}.
 
 \section{Introduction}
 The world of voice-activated virtual assistants is booming. Several giant technological companies, (such as \textit{Amazon}, \textit{Google}, \textit{Microsoft}, \textit{Apple} and \textit{Baidu}) have already developed their version of a virtual assistant. There is a huge research community surrounding this field, potentially promoted by the recent growth of the artificial intelligence (AI) paradigm.
 
-There has been an outstanding evolution in this field, leveraging AI and machine learning (ML) advances for  making virtual assistants behave as close as humans as possible. There are multiple open research lines, such as increasing the accuracy and the relevance of the responses \autocite{milabot2017}, reducing the answer delay \autocite{Han2017} or increasing their variability of the responses \autocite{Li2017}. In particular, Deep Learning (DL) models have revolutionized the field of automatic speech recognition \autocite{Nassif2019}, as language features are highly hierarchical. This work focuses on DL models to increase the accuracy of a voice command recognition task using a limited vocabulary.
+There has been an outstanding evolution in this field, leveraging AI and machine learning (ML) advances for  making virtual assistants behave as close as humans as possible. There are multiple open research lines, such as increasing the accuracy and the relevance of the responses \autocite{milabot2017}, reducing the answer delay \autocite{Han2017} or increasing their variability of the responses \autocite{Li2017}. In particular, deep learning (DL) models have revolutionized the field of automatic speech recognition \autocite{Nassif2019}, as language features are highly hierarchical. This work focuses on DL models to increase the accuracy of a voice command recognition task using a limited vocabulary.
 
 An important factor to take into account is the small size and low power specifications of the usual virtual assistants, which limit the complexity of the models to implement. Furthermore, a low latency is needed to avoid harming the users' experience. DL models usually contain millions of parameters. For that reason, the right choice of number of layers and their architecture is critical. Using the cloud for processing audio commands can partially mitigate this. However, continually transmitting to and from the cloud increases latency and may not be an energy-efficient solution. Therefore, at least the models that process the most common words in a vocabulary, such as keyword spotting (KWS), should be implemented on-device.
 
 The current commercial virtual assistants are still not as accurate as humans at identifying human voice commands \autocite{Michaely2017}. Although substantial efforts have been made and nearly human performance has been reported in several studies \autocite{Andrade2018, Zhang2017, Mcmahan2017, Warden2018}, there is still room for improvement. In particular, bidirectional recurrent models with attention have been used  \autocite{Andrade2018} as these kind of structures are able to accurately model past and future dependencies in the time domain, while attention focuses on important parts of the audio clip. Howewer, the authors state that there are word pairs that are difficult to identify without extra context. Gated convolutional long-short term memory (LSTM) structures have also proven useful by other authors \autocite{Wang2018} to improve the state of the art results on the same data. According to this work, gated convolutions help further learn the local features of speech, improving the model prediction accuracy.
 
-Due to their architecture, convolutional neural networks (CNNs) provide a good approach to optimize computational resources for KWS. In \autocite{Tara2015}, CNNs outperform other deep neural networks (DNNs) architectures, such as recurrent reural networks (RNN), for the constrained KWS task. Other works focus on the hardware implementation of neural networks for KWS \autocite{Zhang2017}, comparing not only their accuracy, but also their memory usage and computation efficiency. According to this work, Deepwise Separable (DS) CNNs achieve both the best accuracy and scalability among the tested architectures.  Transfer learning has also been applied to CNN architectures \autocite{Mcmahan2017}, showing substantial improvements in accuracy.
+Due to their architecture, convolutional neural networks (CNNs) provide a good approach to optimize computational resources for KWS. In \autocite{Tara2015}, CNNs outperform other deep neural networks (DNNs) architectures, such as recurrent reural networks (RNN), for the constrained KWS task. Other works focus on the hardware implementation of neural networks for KWS \autocite{Zhang2017}, comparing not only their accuracy, but also their memory usage and computation efficiency. According to this work, Deepwise separable (DS) CNNs achieve both the best accuracy and scalability among the tested architectures.  Transfer learning has also been applied to CNN architectures \autocite{Mcmahan2017}, showing substantial improvements in accuracy.
 
-The present work provides the insights of the study and implementation of an \textit{Xception}\footnote{\textit{Xception} is a deep CNN architecture that involves Depthwise Separable Convolutions.} based architecture \autocite{chollet2017}, which we named \textit{Xception-1d}, to the speech commands recognition problem.  The contributions of the present work are summarized in the following bullets.
-
- \begin{itemize}
- 	\item Design and implementation of a \textit{depthwise separable} CNN-based architecture able to surpass the current state of the art results and the human performance while keeping the data in the temporal domain (using the raw version of the waveform).
-
- 	\item Development of a new methodology (to the best of our knowledge) for augmenting audio data to increase the size of a data set (5x in this work), and therefore enhance generalization.
-
- 	\item Quantification of the human performance across the different classification tasks to use it as an additional baseline for checking the results achieved by the algorithm.
-
-	\item Creating a public repository where further contributions could be handled to enhance the project functionalities and to facilitate reproducibility.
- \end{itemize}
-
- The article is structured as follows. Right after this introduction, section \ref{sec:MM} introduces the data that has been used to define the tasks to be solved and the methodology and algorithms that have been used in order to achieve the results presented in section \ref{sec:results}. Section \ref{sec:discussion} provides a discussion of the results and section \ref{sec:conclusion} summarizes the insights, takeaways and possible future work lines.
+ % The article is structured as follows. Right after this introduction, section \ref{sec:MM} introduces the data that has been used to define the tasks to be solved and the methodology and algorithms that have been used in order to achieve the results presented in section \ref{sec:results}. Section \ref{sec:discussion} provides a discussion of the results and section \ref{sec:conclusion} summarizes the insights, takeaways and possible future work lines.
 
  \section{Material and methods} \label{sec:MM}
 
 \subsection{Data set}
 One of the major contributions to the collection of open data sets in the field of speech commands recognition has been made by \textit{Google} with the release of the \textit{Google Tensorflow speech commands data set} \autocite{speechcommands, Warden2018}. It consists of a collection of thousands of utterances with a length of one second containing short words, recorded by thousands of people. The recordings were collected remotely, in uncontrolled environments (i.e. without any specific quality requirements). The subjects were asked to say a chain of words during a minute. Then, the recordings were split in clips of one second by extracting the loudest sections of the signal \autocite{speechcommands, Warden2018}.
 
-Two different versions of the \textit{Google Tensorflow speech commands data set} have been used for quantifying the performance of the algorithm across the different tasks, described subsequently. The versions 0.01 and 0.02 of the data set contain 64,721 and 105,829 audio clips of one second (each one containing the recording of one voice command), respectively, with a sample rate of 16 kHz and 16-bit resolution. Each of them is stored in \textit{wav} format. The first data version has up to 30 different commands while the second one has 35 of them. The frequency distribution of the labels is described in Figure \ref{fig:freqdistdata}. For simplicity, we will refer to versions 0.01 and 0.02 as V1 and V2, respectively, from now on.
+Two different versions of the \textit{Google Tensorflow speech commands data set} have been used for quantifying the performance of the algorithm across the different tasks, described subsequently. The versions 0.01 and 0.02 of the data set contain 64,721 and 105,829 audio clips of one second (each one containing the recording of one voice command), respectively, with a sample rate of 16 kHz and 16-bit resolution. Each of them is stored in \textit{wav} format. The first data version has up to 30 different commands while the second one has 35 of them. The frequency distribution of the labels is described in Figure \ref{fig:freqdistdata}. For simplicity, versions 0.01 and 0.02 will be referred as as V1 and V2, respectively, from now on.
 
 
 \begin{figure}[ht]
@@ -119,7 +107,7 @@ Four different tasks have been defined in order to benchmark the proposed algori
 \end{itemize}
 
 
-While it is true that, as we group the unrecognized words under the ``unknown'' category, the imbalance grows, in this kind of systems (speech recognition agents), the precision should be optimized at the expense of a worse recall (in general, the cost of a false positive is higher than that of a false negative). Thus, for our purpose, having a positive imbalance towards the ``unknown'' class does not represent an inconvenience. A summary of the percentage of words grouped under the ``unknown'' category for each task is shown in Table \ref{tab:unknowns}.
+While it is true that, as more unrecognized words are grouped under the ``unknown'' category the imbalance grows, in this kind of systems (speech recognition agents), the precision should be optimized at the expense of a worse recall (in general, the cost of a false positive is higher than that of a false negative). Thus, for this purpose, having a positive imbalance towards the ``unknown'' class does not represent an inconvenience. A summary of the percentage of words grouped under the ``unknown'' category for each task is shown in Table \ref{tab:unknowns}.
 
 \begin{table}[ht]
 	\centering
@@ -151,7 +139,7 @@ All the distortions are applied together with random intensities only to the tra
 
 
 \subsection{Methods}
-We propose the use of a CNN with \textit{depthwise separable convolution} layers and \textit{residual connections}, based on the \textit{Xception architecture}  described by \textit{François Chollet} in 2017 \autocite{chollet2017}. This model is a CNN-based architecture which recently achieved state of the art results in multiple computer vision tasks \autocite{liu2019a, Nazar2018, Song2018}.
+The use of a CNN with \textit{depthwise separable convolution} layers and \textit{residual connections} is proposed, based on the \textit{Xception architecture}  described by \textit{François Chollet} in 2017 \autocite{chollet2017}. This model is a CNN-based architecture which achieved state of the art results in multiple computer vision tasks \autocite{liu2019a, Nazar2018, Song2018}.
 
 \subsubsection{Depthwise separable convolutions} \label{sec:kwsdwscost}
 The \textit{regular convolution} operation consists of the application of a filter over a signal along the spatial/temporal dimension(s) and along the channels in a single operation.
@@ -168,14 +156,14 @@ A \textit{depthwise separable convolution} performs an operation which, given an
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.65\linewidth]{kws/images/dws_conv}
+	\includegraphics[width=1\linewidth]{kws/images/dws_conv_new}
 	\caption{\textit{Depthwise separable convolution} diagram showing how the whole computation is done in two steps: the \textit{depthwise convolution} followed by the \textit{pointwise convolution}.}
 	\label{fig:dwsconv}
 \end{figure}
 
 
 
-The \textit{depthwise convolution} does not combine different channels for producing the output, and hence always produces an output tensor which has the same number of channels as the input tensor. This difference makes this operation much more efficient than the \textit{regular convolution}, at the cost of loosing the ability to generate new features by combining different channels. That is the reason why the \textit{pointwise convolution} is applied after the \textit{depthwise convolution} constituting the \textit{depthwise separable convolution}. The reason why the \textit{separable} term is used in the name of the operation is because we are effectively separating between the channel-wise and the spatial/temporal-wise computations. The number of sums and multiplications required by this operation is $\frac{1}{R} \cdot \frac{1}{O}$ times the number of operations required by a regular convolution (details below)  \autocite{howard2017}, where $O$ is the size of the \textit{depthwise convolution} filters and $R$ is the number of output channels after the \textit{pointwise convolution} is applied. This represents a meaningful performance improvement for big networks.
+The \textit{depthwise convolution} does not combine different channels for producing the output, and hence always produces an output tensor which has the same number of channels as the input tensor. This difference makes this operation much more efficient than the \textit{regular convolution}, at the cost of loosing the ability to generate new features by combining different channels. That is the reason why the \textit{pointwise convolution} is applied after the \textit{depthwise convolution} constituting the \textit{depthwise separable convolution}. The reason why the \textit{separable} term is used in the name of the operation is because the operation is effectively separating between the channel-wise and the spatial/temporal-wise computations. The number of sums and multiplications required by this operation is $\frac{1}{R} \cdot \frac{1}{O}$ times the number of operations required by a regular convolution (details below)  \autocite{howard2017}, where $O$ is the size of the \textit{depthwise convolution} filters and $R$ is the number of output channels after the \textit{pointwise convolution} is applied. This represents a meaningful performance improvement for big networks.
 
 More formally, the \textit{regular convolution} and \textit{depthwise convolution} operations \autocite{howard2017}  are defined\footnote{in both cases assuming a stride of one, \textit{SAME} padding and odd size convolution kernels} in equations \ref{eq:reg_conv} and  \ref{eq:dw_conv} for illustrative purposes, where
 
@@ -201,7 +189,7 @@ See that $\mathbf{S}_{x} =  \sum_{m}^{M} \hat{\mathbf{S}}_{x, m}$. A \textit{poi
 
 The \textit{depthwise separable convolution} is composite function of a \textit{pointwise convolution} and a \textit{depthwise convolution} as follows: $PW(DW(X,W_{d}),W_{p})$ where $PW$ and $DW$ refer to the \textit{pointwise} and \textit{depthwise convolutions}, and $W_{p}$, $W_{d}$ to their weights, similarly.
 
-The \textit{regular convolution} layer targeting $R$ output channels has a computational cost of $D \cdot M \cdot R \cdot O$. The \textit{depthwise convolution} has a computational cost of $D \cdot M \cdot O$,  and the \textit{separable convolution} $D \cdot M \cdot R$. Therefore the \textit{depthwise separable convolution} has a computational cost  of $D \cdot M  \cdot O + D \cdot M \cdot R$, i.e. the sum of its two constituting operations. Hence, by using the \textit{depthwise separable convolution} in place of the \textit{regular} one we have a cost reduction of:
+The \textit{regular convolution} layer targeting $R$ output channels has a computational cost of $D \cdot M \cdot R \cdot O$. The \textit{depthwise convolution} has a computational cost of $D \cdot M \cdot O$,  and the \textit{separable convolution} $D \cdot M \cdot R$. Therefore the \textit{depthwise separable convolution} has a computational cost  of $D \cdot M  \cdot O + D \cdot M \cdot R$, i.e. the sum of its two constituting operations. Hence, by using the \textit{depthwise separable convolution} in place of the \textit{regular} one, the cost reduces as follows:
 
 $$ \frac{D \cdot M \cdot O  + D \cdot M \cdot R} {D \cdot M \cdot R \cdot O} = \frac{1}{R} + \frac{1}{O} $$
 
@@ -223,7 +211,7 @@ The \textit{Xception-1d} architecture is shown in Figure \ref{fig:arch}. It has 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.4\linewidth]{kws/images/xception_module.eps}
-	\caption{Neural network module refered as \textit{Xception-1d block}. The \textit{Xception-1d block} represents the building block of the architecture proposed in this work. It consists of a set of $n_{mod}$ \textit{1-D depthwise separable convolution} layers with a \textit{residual connection} and with a \textit{1-D average pooling} layer at the end. The activation function used is the \textit{rectified linear unit} (ReLU) and the normalization procedure after each convolutional layer is the \textit{instance normalization} for one dimensional sequences.}
+	\caption{Neural network module refered as \textit{Xception-1d block}. The \textit{Xception-1d block} represents the building block of the architecture proposed in this work. It consists of a set of $n_{mod}$ \textit{1-D depthwise separable convolution} layers with a \textit{residual connection} and with a \textit{1-D average pooling} layer at the end. The activation function used is the \textit{rectified linear unit} (ReLU) and the normalization procedure after each convolutional layer is the \textit{instance normalization} for one dimensional sequence.}
 	\label{fig:xceptionmodule}
 \end{figure}
 
@@ -240,7 +228,7 @@ Considering that the last dense layer can be prone to overfitting due to the hig
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.7\linewidth]{kws/images/normcubes}
-	\caption{Each cube represents a batch of data where $B$ is the instances axis (with the batch size), $M$ is the channels axis and $D$ is the spatial/temporal dimension. (a) represents \textit{batch normalization}, (b) is \textit{instance normalization} and (c) shows \textit{layer normalization}. The shaded areas in the cubes represent the dimensions that are aggregated in each case for computing the statistics used to normalize the data (generally the mean and the standard deviation). As it can be noticed, the only normalization technique that depends on instances of data in the batch is the \textit{batch normalization}, that is why it is more sensitive to train-test distribution differences. As it can be noticed in the picture, \textit{instance normalization} is a specific version of \textit{layer normalization} where each channel is normalized separately}
+	\caption{Each cube represents a batch of data where $B$ is the instances axis (with the batch size), $M$ is the channels axis and $D$ is the spatial/temporal dimension. (a) represents \textit{batch normalization}, (b) is \textit{instance normalization} and (c) shows \textit{layer normalization}. The shaded areas in the cubes represent the dimensions that are aggregated in each case for computing the statistics used to normalize the data (generally the mean and the standard deviation). As it can be noticed, the only normalization technique that depends on instances of data in the batch is the \textit{batch normalization}, that is why it is more sensitive to train-test distribution differences. As it can be noticed in the picture, \textit{instance normalization} is a specific version of \textit{layer normalization} where each channel is normalized separately.}
 	\label{fig:normcubes}
 \end{figure}
 
@@ -248,7 +236,7 @@ Considering that the last dense layer can be prone to overfitting due to the hig
 
 
 \section{Results} \label{sec:results}
-The train/development/test split provided by the authors of the data set \autocite{speechcommands} has been used as \textit{cross validation} (CV) setting in order to facilitate future benchmarking efforts. A simple split CV has been used instead of K-fold CV for the following reasons: (1) these models are expensive to train. Forty deep models (2 data set versions $\times$ 4 tasks $\times$ 5 random initializations) were trained per experiment. If we added K-Fold CV it would become unfeasible; (2) for the sake of reproducibility and benchmarking, as the authors of the dataset provide a default list of clips to use as validation and test.
+The train/development/test split provided by the authors of the data set \autocite{speechcommands} has been used as \textit{cross validation} (CV) setting in order to facilitate future benchmarking efforts. A simple split CV has been used instead of K-fold CV for the following reasons: (1) these models are expensive to train. Forty deep models (2 data set versions $\times$ 4 tasks $\times$ 5 random initializations) were trained per experiment. If K-Fold CV was used it would become unfeasible; (2) for the sake of reproducibility and benchmarking, as the authors of the data set provide a default list of clips to use as validation and test.
 
 Versions V1 and V2 of the data set have 16,000 and 9,981 hold out samples for development purposes and 16,000 and 11,005 hold out samples for testing purposes, respectively. The development set has been used to manually tune the hyperparameters and for \textit{early stopping} purposes. The model has been trained for 50 epochs in each case, with a batch size of 32 clips, and the weights of the epoch that achieved the best performance in the development set were checkpointed. The checkpointed models have been used to calculate and report the performance of the algorithm.
 
@@ -270,7 +258,7 @@ Besides the global results, Figure \ref{fig:boxplot35002} shows the precision an
 
 \begin{table}[h!]
 	\centering
-	\caption{Accuracy (mean $\pm$ standard deviation) obtained by the proposed solution on the different tasks compared to other benchmark algorithms (described in \autocite{Andrade2018, Mcmahan2017, Warden2018,Zhang2017}) and compared to our measurement of human accuracy (through 4 manual evaluations). The results of best performing algorithms for each task have been highlighted in bold in each case. Results better than human performance (given a statistical significance level of $\alpha = 0.05$) have been tagged with a star mark (*).}
+	\caption{Accuracy (mean $\pm$ standard deviation) obtained by the proposed solution on the different tasks compared to other benchmark algorithms (described in \autocite{Andrade2018, Mcmahan2017, Warden2018,Zhang2017}) and compared to the measurement of human accuracy (through 4 manual evaluations). The results of best performing algorithms for each task have been highlighted in bold in each case. Results better than human performance (given a statistical significance level of $\alpha = 0.05$) have been tagged with a star mark (*).}
 	\label{tab:comparative}
 
 
@@ -305,8 +293,7 @@ Besides the global results, Figure \ref{fig:boxplot35002} shows the precision an
 \end{table}
 
 
-
-\begin{table}[h] \centering \scriptsize
+\begin{table}[h!] \centering \scriptsize
 	\caption{Detailed results for task \textit{35-words-recognition} and V2 data set, in decreasing f1-score order. The columns ``precision'', ``recall'' and ``f1-score'' have been represented as the mean $\pm$ the standard deviation in percentage scale. } \label{tab:kwsperclassresults35}
 	\begin{tabular}{lcccc}
 		\toprule
@@ -353,7 +340,7 @@ Besides the global results, Figure \ref{fig:boxplot35002} shows the precision an
 \end{table}
 
 
-\begin{table}[h] \centering \scriptsize
+\begin{table}[h!] \centering \scriptsize
 	\caption{Detailed results for task \textit{left-right} and data version V2, sorted by decreasing f1-score order. The columns ``precision'', ``recall'' and ``f1-score'' have been represented as the mean $\pm$ the standard deviation in percentage scale. } \label{tab:kwsperclassresults2}
 	\begin{tabular}{lcccc}
 		\toprule
@@ -369,25 +356,28 @@ Besides the global results, Figure \ref{fig:boxplot35002} shows the precision an
 
 
 
+
 \section{Discussion} \label{sec:discussion}
 
 The presented method, \textit{Xception-1d}, offers better performance than the existing methods in the literature for three out of the four tested tasks, using different sets of limited-size vocabularies. According to the results in Table \ref{tab:comparative}, \textit{Xception-1d} performed voice recognition better than the state of the art methods  \autocite{Andrade2018, Zhang2017, Mcmahan2017, Warden2018} in three out of four tasks: \textit{35-words-recognition}, \textit{20-commands-recognition}, and \textit{10-commands-recognition}. In the only task where \textit{Xception-1d} did not achieve the best results (left-right), the leading method was the one proposed by Andrade \textit{et al}. \autocite{Andrade2018} which was only marginally better ($<$0.5\% performance difference on the test set) than the presented method. \textit{Xception-1d} even surpassed human performance (with statistical significance level) in the two first tasks, including the most difficult one (\textit{35-words-recognition}).
 
-With regard to per-class accuracy, it can be noticed from Figure \ref{fig:boxplot35002} that the algorithm performs generally well for all the classes in the most difficult scenario (35-words task) as the majority of precision and recall values lay between 90-100\%. Nonetheless, we found that the algorithm has more difficulties differentiating some groups of similar words like the following pairs: ``three'' and ``tree'', ``follow'' and ``four'', ``bed'' and ``bird'', etc. No comparison with other existing models has been included because no such detailed results have been found in the related work.
+With regard to per-class accuracy, it can be noticed from Figure \ref{fig:boxplot35002} that the algorithm performs generally well for all the classes in the most difficult scenario (35-words task) as the majority of precision and recall values lay between 90-100\%. Nonetheless, the algorithm has more difficulties differentiating some groups of similar words like the following pairs: ``three'' and ``tree'', ``follow'' and ``four'', ``bed'' and ``bird'', etc. No comparison with other existing models has been included because no such detailed results have been found in the related work.
 
-Finally, our findings show that the per-class performance of the speech commands in the \textit{left-right} task is lower than for the other tasks (in particular the recall values) (see tables \ref{tab:kwsperclassresults35} and \ref{tab:kwsperclassresults2}). However, the per-class performance for these two classes was higher when they were included in a multi class classification task like the \textit{35-words-recognition} task. This fact motivates us to hypothesize that auxiliary tasks (in this case the 35-words vocabulary task) are benefiting primary tasks (left-right), as more features may be extracted from more complex tasks. This hypothesis has been proven for Reinforcement Learning \autocite{Jaderberg2016}, but may also apply to DL efforts.
+Finally, the findings show that the per-class performance of the speech commands in the \textit{left-right} task is lower than for the other tasks (in particular the recall values) (see tables \ref{tab:kwsperclassresults35} and \ref{tab:kwsperclassresults2}). However, the per-class performance for these two classes was higher when they were included in a multi class classification task like the \textit{35-words-recognition} task \autocite{caruana1997}. This evidence motivates the hypothesis that auxiliary tasks (in this case the 35-words vocabulary task) are benefiting primary tasks (left-right), as more features may be extracted from more complex tasks. This hypothesis has been proven for Reinforcement Learning \autocite{Jaderberg2016}, but may also apply to DL efforts.
 
 
 
 
 \section{Conclusion} \label{sec:conclusion}
-This work shows how a neural network architecture which succeeded in the computer vision field, with an adaption and a set of tweaks, is able to surpass human performance at a speech recognition task with limited vocabulary achieving state of the art results. This is why we suggest \textit{Xception-1d} as the \textit{de facto} architecture when facing a voice command recognition task with restricted vocabulary. The algorithm presented can have multiple  applications for improving voice-controlled systems.
+This chapter provided the insights of the study and implementation of an \textit{Xception} based architecture \autocite{chollet2017}, named \textit{Xception-1d}, to the speech commands recognition problem.
 
-A possible future line of work could be  the use of \textit{Xception-1d} architecture with a global pooling layer at the end  as an encoder of a \textit{sequence-to-sequence} architecture for tackling a speech recognition task with free vocabulary (e.g. a \textit{speech to text} engine). In addition to the usage of efficient convolutions, we recommend exploring pruning and complexity reduction techniques to further reduce the computational cost of the proposed solution.
+The experiments conducted give empirical evidence on how a neural network architecture which succeeded in the computer vision field, with an adaption and a set of tweaks, is able to surpass human performance at a speech recognition task with limited vocabulary achieving state of the art results. This motivates the suggestion of \textit{Xception-1d} as the \textit{de facto} architecture when facing a voice command recognition task with restricted vocabulary. The algorithm presented can have multiple  applications for improving voice-controlled systems.
+
+A possible future line of work could be  the use of \textit{Xception-1d} architecture with a global pooling layer at the end  as an encoder of a \textit{sequence-to-sequence} architecture for tackling a speech recognition task with free vocabulary (e.g. a \textit{speech to text} engine). In addition to the usage of efficient convolutions, exploring pruning and complexity reduction techniques is recommended to further reduce the computational cost of the proposed solution.
 
 
 
-%
+%.   
 %
 %\newpage
 %
