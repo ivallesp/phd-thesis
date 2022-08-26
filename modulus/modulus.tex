@@ -2,9 +2,11 @@
 \chapter{The modulus as activation function} \label{ch:modulus}
 
 \section{Overview}
-The idea of decreasing the size of neural networks has been studied since long time ago \autocite{lecun1989, hassibi1993, frankleC19}. Many applications may require to be efficient at training or at inference times, especially the models that need to be executed on mobile and embedded devices \autocite{ooko2021, zapico2021}. One of the most impressive examples is the wake word detection system of the \textit{Google} assistant, which was reported to be a neural network that only weights 14 kilobytes in size \autocite{warden2020}. The subfield of machine learning that researches how to lower the computational cost is commonly known as \textit{TinyML} \autocite{han2022}. \textit{TinyML} not only brings obvious energy consumption benefits but it can also be used to reduce the latency of the response of such systems because the devices would no longer need to query large cloud servers, removing the dependency on internet connections and allowing them to work offline. Furthermore, the common privacy concerns of machine learning applications \autocite{ha2019} can be easily diluted if all the sensible data collected are processed solely into the device, and never leaves home.
+The idea of decreasing the size of neural networks has been studied since long time ago \autocite{lecun1989, hassibi1993, frankleC19}. Many applications may require to be efficient at training or at inference times, especially the models that need to be executed on mobile and embedded devices \autocite{ooko2021, zapico2021}. One of the most impressive examples is the wake word detection system of the \textit{Google} assistant, which was reported to weight only 14 kilobytes in size \autocite{warden2020}. 
 
-This chapter introduces a new non-monotonic activation function -- the \textit{modulus}-- which simplicity makes it specially suitable for \textit{TinyML} and other low resource applications: the modulus and its derivative are simply bit-size operations. The experiment results provide evidence that using the \textit{modulus} activation function on computer vision tasks the models generalize better than with other nonlinearities - up to a 15\% accuracy increase in \textit{CIFAR100} and 4\% in \textit{CIFAR10}, relative to the best of the benchmark activations tested. With the proposed activation function the vanishing gradient and dying neurons problems disappear, because the derivative of the activation function is always either 1 or -1.
+The subfield of machine learning that researches how to minimize the computational cost is commonly known as \textit{TinyML} \autocite{han2022}. \textit{TinyML} not only brings obvious energy consumption benefits but it can also be used to reduce the latency of the response of such systems because the devices would no longer need to query large cloud servers, removing the dependency on internet connections and allowing them to work offline. Furthermore, the common privacy concerns of machine learning applications \autocite{ha2019} can be easily diluted if all the sensible data collected are processed solely into the device, and never leaves home.
+
+This chapter introduces a new non-monotonic activation function --the \textit{modulus}-- which simplicity makes it specially suitable for \textit{TinyML} and other low resource applications: the modulus and its derivative are simply bit-size operations. Interestingly, the gradient norm does not depend on the input, which removes some of the problems reported on other nonlinearities \autocite{lu2020, pascanu13, hochreiter1998, Hochreiter2001}. The experiment results provide evidence that when using the \textit{modulus} activation function on computer vision tasks the models generalize better than with other nonlinearities - up to a 15\% accuracy increase in \textit{CIFAR100} dataset and 4\% in \textit{CIFAR10} dataset (with respect to the benchmark activations tested). 
 
 
 
@@ -12,12 +14,14 @@ The code used along this work has been made available in a public repository\foo
 
 
 \section{Introduction}
-As discussed in section \ref{sec:mlp}, the core piece of all deep learning models is the activation function. They enable the models to produce non-linear abstract representations when applying linear transformations in cascade \autocite{Goodfellow2016}. The most common choice in modern deep learning models is the Rectified Linear Unit (\textit{ReLU}) \autocite{nair2010}. Among other advantages, \textit{ReLU} nonlinearities allowed to train deeper neural networks \autocite{xu2015}.
+As discussed in section \ref{sec:mlp}, the core piece of all deep learning models is the activation function. They enable the models to produce non-linear abstract representations when applying linear transformations in cascade \autocite{Goodfellow2016}. The most common choice in modern deep learning models is the Rectified Linear Unit (\textit{ReLU}) \autocite{nair2010}. Among other advantages, \textit{ReLU} nonlinearities allow to train deeper neural networks \autocite{xu2015}.
 
 \section{Previous work}
 Apart from the \textit{ReLU} in the last years there have appeared many alternative activation functions. The following studies represent some of the most popular examples: \textit{Leaky-ReLU} and \textit{PR-ReLU} \autocite{xu2015}, \textit{ELU} \autocite{djork2016}, \textit{Swish} \autocite{ramachandran2018}, \textit{SELU} \autocite{klambauer2017}, \textit{F/PFLU} \autocite{zhu2020}, \textit{RSigElu} \autocite{Kilicarslan2021} etc. All those activation functions have the following properties in common: nonlinearity, continuity, differentiability and low computational cost (being \textit{Swish} the most computationally expensive option). The majority of the activation functions are monotonic, \textit{Swish} \autocite{ramachandran2018}, \textit{GELU} \autocite{hendrycks2016},  \textit{S-ReLU} \autocite{Jin2016} and \textit{Mish} \autocite{misra2019mish} are some of the most popular modern exceptions. Despite the large pool of alternatives, \textit{ReLU} still appears as the default choice in many applications due to its simplicity and low computational cost \autocite{nair2010}.
 
-This study delves into the world of the non-monotonic nonlinearities and proposes the \textit{modulus} function (aka absolute value) as an activation function, providing empirical evidences  proving that this activation function allows deep learning models to converge to better solutions in \textit{CIFAR10}, \textit{CIFAR100} and \textit{MNIST} datasets. Compared with other modern non-monotonic nonlinearities such as \textit{Mish} \autocite{misra2019mish}, \textit{PFLU} and \textit{FPFLU} \autocite{zhu2020} or \textit{Swish}  \autocite{ramachandran2018}, the \textit{modulus} has a very low computational cost (equivalent to \textit{ReLU}). This property makes the \textit{modulus} specially useful for \textit{TinyML} \autocite{sanchez2020} and hardware \autocite{Misra2010} applications.
+This chapter delves into the world of the non-monotonic nonlinearities and proposes the \textit{modulus} function (aka absolute value) as an activation function, providing empirical evidences  proving that this activation function allows deep learning models to converge to better solutions in \textit{CIFAR10}, \textit{CIFAR100} and \textit{MNIST} datasets. 
+
+Compared with other modern non-monotonic nonlinearities such as \textit{Mish} \autocite{misra2019mish}, \textit{PFLU} and \textit{FPFLU} \autocite{zhu2020} or \textit{Swish}  \autocite{ramachandran2018}, the \textit{modulus} has a very low computational cost (equivalent to \textit{ReLU}). This property makes the \textit{modulus} specially useful for \textit{TinyML} \autocite{sanchez2020} and hardware \autocite{Misra2010} applications.
 
 %The contributions of this work are: (1) proposal of the modulus as activation function, (2) the proposed function empirically shows significantly superior results in 75\% of our experiments, (3) we- contribute to the new trend of non-monotonic activation functions with another example showing results in the same direction, (4) the simplicity of the modulus activation function makes it very suitable for hardware applications and \textit{TinyML}, and (5) we- propose two smooth approximation to the \textit{modulus} function, one of them achieving even superior results than the original \textit{modulus}.
 
@@ -29,7 +33,7 @@ This study delves into the world of the non-monotonic nonlinearities and propose
 
 \section{Methods} \label{sec:modulus_methods}
 \subsection{Modulus activation function}
-This section introduces the proposed activation function, the \textit{modulus}: $f(x)=|x|$. This nonlinearity is a continuous, piecewise-linear function consisting of an identity mapping for positive values of $x$, and a negative identity mapping for negative values of $x$. Its derivative (defined below), as well as the modulus function itself, are bit-size operations. This is extremely useful for hardware implementations. Besides, the modulus function can be expressed as $f(x) = \text{sgn}(x)\cdot x$, where $f'(x) = \text{sgn}(x)$. In practice, this means that the derivative can be calculated as part of the forward pass and cached for the \textit{backpropagation}, reducing the total computation. This form is also specially useful in hardware implementations, given that the whole activation function is fully represented as a bit-size operation (the sign function).
+This section introduces the proposed activation function, the \textit{modulus}: $f(x)=|x|$. This nonlinearity is a continuous, piecewise-linear function consisting of an identity mapping for positive values of $x$, and a negative identity mapping for negative values of $x$. Its derivative (defined below) as well as the modulus function itself, are bit-size operations. This is extremely useful for hardware implementations. Besides, the modulus function can be expressed as $f(x) = \text{sgn}(x)\cdot x$, where $f'(x) = \text{sgn}(x)$. In practice, this means that the derivative can be calculated as part of the forward pass and cached for the \textit{backpropagation}, reducing the total computation. This form is also specially useful in hardware implementations, given that the whole activation function is fully represented as a bit-size operation (the sign function).
 
 $$
 f'(x)= \left\{ \begin{array}{lcc}
@@ -125,7 +129,8 @@ Let $f^x_{\text{low}}=-x$, $f^x_{\text{med}}=x^2$ and $f^x_{\text{high}}=x$. The
 	\item For $x \geq 1$:  $\hat{f}(x)=\frac{f^x_{\text{high}} \cdot \mu^x_{\text{high}}}{\mu^x_{\text{high}}}=x$
 \end{itemize}
 
-Combining and simplifying all the above expressions the final activation function is obtained.
+Combining and simplifying all the above expressions the final activation function is obtained. This approximation is subsequently referred as \textit{SoftModulusQ}.
+
 
 $$
 f(x)= \left\{ \begin{array}{lcc}
@@ -135,13 +140,13 @@ x^2 \cdot (2-|x|) &  \text{if} & |x| \leq 1 \\
 \right.
 $$
 
-This approximation is subsequently referred as \textit{SoftModulusQ}.
 
 \subsubsection{Hyperbolic tangent approximation}
-Starting from the modulus function $f(x)=sgn(x)\cdot x$, the $sgn$ function is approximated as follows $sgn(x) \approx \tanh(x/\beta)$, where $\beta \in [0, 1]$ is a tunable hyperparameter that controls how acute the ``V'' transition is. The smaller the $\beta$, the closest the approximation is to the \textit{modulus}. A value of $\beta=0.01$ is used along all the trained models.
+Starting from the modulus function $f(x)=sgn(x)\cdot x$, the $sgn$ function is approximated as follows $sgn(x) \approx \tanh(x/\beta)$, where $\beta \in [0, 1]$ is a tunable hyperparameter that controls how acute the ``V'' transition is. The smaller the $\beta$, the closest the approximation is to the \textit{modulus}. A value of $\beta=0.01$ is used along all the trained models. In the rest of the chapter, this approximation is referred as \textit{SoftModulusT}.
+
 	$$f(x) = x \cdot \tanh(x/\beta)$$
 
-In the rest of the chapter,this approximation is referred as \textit{SoftModulusT}.
+
 
 % TODO: \usepackage{graphicx} required
 
@@ -162,7 +167,7 @@ The following activation functions have been used as a benchmark to compare the 
 	\right.
 	$$
 
-	\item \textit{Swish}: this is one of the few non-monotonic activation functions formally published \autocite{ramachandran2018}. It gained its popularity because it showed promising results in multiple applications. It is defined as $f(x) = x \cdot \sigma(\beta x)$, where $\beta$ is a hyperparameter to be tuned.
+	\item \textit{Swish}: this is one of the few non-monotonic activation functions formally published \autocite{ramachandran2018}. It is defined as $f(x) = x \cdot \sigma(\beta x)$, where $\beta$ is a hyperparameter to be tuned. It gained its popularity by showing promising results in multiple applications. 
 	\item \textit{Mish}: this is a smooth, non-monotonic and self-regularized activation function, similar to \textit{Swish}, showing superior performance in different benchmarks \autocite{misra2019mish}. It is defined as $f(x) = x \tanh \left[\text{softplus} (x)\right]$, where $\text{softplus} (x) = \log(1+e^x)$ \autocite{dugas2001}.
 	\item \textit{PFLU}: the Power Function Linear Unit (PFLU) is a non-monotonic activation function that showed good performance in convolutional architectures \autocite{zhu2020}. It is defined as follows: $f(x) = x \cdot \frac{1}{2} \left( 1 + \frac{x}{\sqrt{1+x^2}} \right)$.
 
@@ -173,11 +178,13 @@ The following activation functions have been used as a benchmark to compare the 
 
 
 
-For the following experiments, \textit{CIFAR10}, \textit{CIFAR100} \autocite{krizhevsky09} and \textit{MNIST} \autocite{lecun2010} datasets have been used. \textit{CIFAR10} and \textit{CIFAR100} images are labeled into 10 and 100 classes, respectively. They are of size 32x32 and full color. In both cases, the datasets contain 50,000 images for training and 10,000 images for testing purposes. \textit{MNIST} images belong to one of 10 classes and are in grey scale and 28x28 size. \textit{MNIST} comes with 50,000 images for training and 10,000 images for testing purposes.
+For the following experiments, \textit{CIFAR10}, \textit{CIFAR100} \autocite{krizhevsky09} and \textit{MNIST} \autocite{lecun2010} datasets have been used. \textit{CIFAR10} and \textit{CIFAR100} images are labeled into 10 and 100 classes, respectively. They are of size 32x32 and full color. 
+
+In both cases, the datasets contain 50,000 images for training and 10,000 images for testing purposes. \textit{MNIST} images belong to one of 10 classes and are in grey scale and 28x28 size. \textit{MNIST} comes with 50,000 images for training and 10,000 images for testing purposes.
 
 The images of the datasets have been normalized so that the minimum and the maximum values are -1 and 1. 
 
-Four different architectures have been used to test the performance of the \textit{modulus} activation function against the other nonlinearities. These architectures are described in Table \ref{tab:architectures}. The architectures choice has been inspired on the \textit{Lottery Ticket Hypothesis} paper \autocite{frankleC19}.
+Four different architectures have been used to test the performance of the \textit{modulus} activation function against the other nonlinearities. These architectures, described in Table \ref{tab:architectures}, are inspired on the ones used in the \textit{Lottery Ticket Hypothesis} study \autocite{frankleC19}.
 
 
 \begin{table}[h] \small
@@ -264,7 +271,7 @@ Table \ref{tab:modulus_results} summarizes the results of the classifiers for \t
 Figure \ref{fig:training_curves} shows the average training curves for the 12 experiments (the curves of the smooth approximations have been included in figure \ref{fig:training_curves_smooth} to compare them with the \textit{modulus}). As it can be noticed in several cases (e.g. \textit{CIFAR10-Conv2}, \textit{CIFAR10-Conv6}, \textit{CIFAR100-Conv6}), the accuracy of the networks with \textit{modulus} activation function keeps increasing at the 100th epoch while the benchmarks have already stabilized. That observation suggests that, if trained for longer, probably the accuracy would increase even more.
 
 
-\begin{table}[h!] \footnotesize  \setlength{\tabcolsep}{3pt}
+\begin{table}[hp!] \footnotesize  \setlength{\tabcolsep}{3pt}
 	\caption{Accuracy comparison for the soft approximations of the \textit{modulus} function, compared with the original \textit{modulus} definition. The results are expressed as mean $\pm$ standard deviation across the 30 random initializations. The models with highest accuracy are highlighted in bold. A star is added to those cases where a \textit{SoftModulus} activation function achieved significantly higher results than the \textit{modulus}, with a significance level of $\alpha=0.05$.}
 	\centering
 	\begin{tabular}{rrcccc}
@@ -292,7 +299,7 @@ Figure \ref{fig:training_curves} shows the average training curves for the 12 ex
 	\label{fig:training_curves_smooth}
 \end{figure}
 
-The results of the \textit{SoftModulus} approximations compared with the \textit{modulus} activation function are summarized in table \ref{tab:modulus_results_smooth}. Additionally, figure \ref{fig:training_curves_smooth} shows the training curves for the same activations. The \textit{SoftModulusQ} approximation achieved significantly better results than the original modulus in several cases (\textit{FC} model over \textit{CIFAR10} and \textit{MNIST} dataset, and \textit{Conv6} over \textit{MNIST} dataset); however it seems to be much more unstable: on VGG16, the gradients of the models with \textit{SoftModulusQ} activations vanish at the beginning of the training process due to the fact that the weights are initialized very close to zero and the gradients are too small, causing numerical problems. This problem may be solved tweaking the initialiation. However, the \textit{SoftModulusT} approximation seems to be on-par with the original \textit{modulus} in the majority of cases, while it performs significantly better for deep architectures like \textit{VGG16}. A plausible hypotyhesis explaining that observation is  that the difference between the two approximations is due to the width of the zero gradient region around $x=0$: wider regions lead to more training problems (see figure \ref{fig:activationssmooth}). The $\beta$ parameter in the hyperbolic tangent approximation allows for easily adjust this zero-gradient region. Different values of beta were informally tested concluding that for high values of $\beta$ (e.g. $\beta=1.0$) the model struggles to train due to numerical precision problems (small values of weights lead to tiny gradients). A value of $\beta=0.01$ seems to work well for all the tested experiments. Finally, the \textit{SoftModulusT} approximation achieves superior results than the original \textit{modulus} when used in the \textit{VGG16} architecture.
+The results of the \textit{SoftModulus} approximations compared with the \textit{modulus} activation function are summarized in table \ref{tab:modulus_results_smooth}. Additionally, figure \ref{fig:training_curves_smooth} shows the training curves for the same activations. The \textit{SoftModulusQ} approximation achieved significantly better results than the original modulus in several cases (\textit{FC} model over \textit{CIFAR10} and \textit{MNIST} dataset, and \textit{Conv6} over \textit{MNIST} dataset); however it seems to be much more unstable: on VGG16, the gradients of the models with \textit{SoftModulusQ} activations vanish at the beginning of the training process due to the fact that the weights are initialized very close to zero and the gradients are too small, causing numerical issues. This problem may be solved tweaking the initialiation. However, the \textit{SoftModulusT} approximation seems to be on-par with the original \textit{modulus} in the majority of cases, while it performs significantly better for deep architectures like \textit{VGG16}. A plausible hypotyhesis explaining that observation is  that the difference between the two approximations is due to the width of the zero gradient region around $x=0$: wider regions lead to more training problems (see figure \ref{fig:activationssmooth}). The $\beta$ parameter in the hyperbolic tangent approximation allows for easily adjust this zero-gradient region. Different values of beta were informally tested concluding that for high values of $\beta$ (e.g. $\beta=1.0$) the model struggles to train due to numerical precision problems (small values of weights lead to tiny gradients). A value of $\beta=0.01$ seems to work well for all the tested experiments. Finally, the \textit{SoftModulusT} approximation achieves superior results than the original \textit{modulus} when used in the \textit{VGG16} architecture.
 
 
 

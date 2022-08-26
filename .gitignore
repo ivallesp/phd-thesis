@@ -18,7 +18,6 @@
 *.url
 *.svn
 *.toc
-./*.pdf
 *eps-converted-to.pdf
 *.bcf
 *.dvi
