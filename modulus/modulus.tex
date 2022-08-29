@@ -50,7 +50,7 @@ The \textit{modulus} activation function belongs, in essence, to the family of r
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1.0\linewidth]{modulus/images/activations}
-	\caption{Nonlinearities used along this study. (a-g) are benchmark activation functions that showed good performance in previous studies. (h) is the \textit{modulus} activation function proposed in this chapter. For this example, the default hyper-parameters have been used for the \textit{Leaky-ReLU}, \textit{ELU} and \textit{Swish} activation functions, respectively.
+	\caption[Nonlinearities compared with the \textit{modulus}]{Nonlinearities used along this study. (a-g) are benchmark activation functions that showed good performance in previous studies. (h) is the \textit{modulus} activation function proposed in this chapter. For this example, the default hyper-parameters have been used for the \textit{Leaky-ReLU}, \textit{ELU} and \textit{Swish} activation functions, respectively.
 	}
 	\label{fig:activations}
 \end{figure}
@@ -64,7 +64,7 @@ The \textit{modulus} function is not differentiable when $x=0$. To study if this
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.5\linewidth]{modulus/images/activations_smooth}
-	\caption{Representation of the two \textit{SoftModulus} activation functions compared with the original \textit{modulus}: \textit{SoftModulusQ} and \textit{SoftModulusT}.}
+	\caption[Soft approximations to the \textit{modulus}]{Representation of the two \textit{SoftModulus} activation functions compared with the original \textit{modulus}: \textit{SoftModulusQ} and \textit{SoftModulusT}.}
 	\label{fig:activationssmooth}
 \end{figure}
 
@@ -75,14 +75,14 @@ A fuzzy set approach is chosen as a method to combine the modulus function with 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.7\linewidth]{modulus/images/funcs_quad}
-	\caption{Quadratic and modulus functions, together with the combined one (in blue, red and green, respectively).}
+	\caption[Functions used for the quadratic approximation of the \textit{modulus}]{Quadratic and modulus functions, together with the combined one (in blue, red and green, respectively).}
 	\label{fig:fuzzy_funcs}
 \end{figure}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.7\linewidth]{modulus/images/fuzzy}
-	\caption{Membership functions used to combine the quadratic and modulus functions.)}
+	\caption[Membership functions for the quadratic approx. of the \textit{modulus}]{Membership functions used to combine the quadratic and modulus functions.}
 	\label{fig:fuzzy}
 \end{figure}
 
@@ -188,7 +188,7 @@ Four different architectures have been used to test the performance of the \text
 
 
 \begin{table}[h] \small
-	\caption{Deep learning architectures used to experiment with different activations. In the dense layers row, the output size has been represented as $C$. The Fully connected architecture (\textit{FC}) is a multilayer perceptron with 2 hidden layers + the output layer. The \textit{Conv2} and \textit{Conv6} architectures are shallow variants of \textit{VGG} described here: \autocite{simonyan2015}. The last pooling layer of the \textit{VGG-16} original architecture has been trimmed in order to allow this model to work with smaller image sizes.}
+	\caption[Architectures used to benchmark the activation functions]{Deep learning architectures used to experiment with different activations. In the dense layers row, the output size has been represented as $C$. The Fully connected architecture (\textit{FC}) is a multilayer perceptron with 2 hidden layers + the output layer. The \textit{Conv2} and \textit{Conv6} architectures are shallow variants of \textit{VGG} described here: \autocite{simonyan2015}. The last pooling layer of the \textit{VGG-16} original architecture has been trimmed in order to allow this model to work with smaller image sizes.}
 	\setcellgapes{3pt}\makegapedcells
 	\begin{tabular}[t]{lllll}
 		\toprule
@@ -212,7 +212,7 @@ Four different architectures have been used to test the performance of the \text
 
 
 \begin{table}[h!] \footnotesize  \setlength{\tabcolsep}{3pt}
-	\caption{Classification accuracy for all the datasets and activation functions tested (rows), and for all the models (columns). The results are expressed as mean $\pm$ standard deviation across the 30 random initializations. To facilitate the reading of the table, for each dataset-model combination, the results have been colored as follows: the best result (highest accuracy) has been colored in blue, the second in green, the third in yellow and the fourth in red (\colorbox{First}{first} $>$ \colorbox{Second}{second} $>$ \colorbox{Third}{third} $>$ \colorbox{Fourth}{fourth}). Additionally, the cases where any of the proposed activation functions achieved significantly higher accuracy (with a significance level of $\alpha=0.05$) than the benchmarks is marked in bold. A \textit{Wilcoxon one-sided Rank Sum} test has been used to quantify the statistical significance.}
+	\caption[Classification accuracy for all the activation functions]{Classification accuracy for all the datasets and activation functions tested (rows), and for all the models (columns). The results are expressed as mean $\pm$ standard deviation across the 30 random initializations. To facilitate the reading of the table, for each dataset-model combination, the results have been colored as follows: the best result (highest accuracy) has been colored in blue, the second in green, the third in yellow and the fourth in red (\colorbox{First}{first} $>$ \colorbox{Second}{second} $>$ \colorbox{Third}{third} $>$ \colorbox{Fourth}{fourth}). Additionally, the cases where any of the proposed activation functions achieved significantly higher accuracy (with a significance level of $\alpha=0.05$) than the benchmarks is marked in bold. A \textit{Wilcoxon one-sided Rank Sum} test has been used to quantify the statistical significance.}
 	\centering
 	\begin{tabular}{rrcccc}
 		\toprule
@@ -257,7 +257,7 @@ Four different architectures have been used to test the performance of the \text
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1.0\linewidth]{modulus/images/training_curves}
-	\caption{Training curves of all the trained models. Each line represents the average accuracy of 30 runs of a model. The shade beahind to each line shows the 95\% confidence interval around the mean. Notice that the scales in the y-axis are not shared to allow for better zoom in each figure, comparing the performance across models is not the objective of this study. Details like the shades are better viewed in a screen.}
+	\caption[Training curves for the different activation functions]{Training curves of all the models. Each line represents the average accuracy of 30 runs of a model. The shade beahind to each line shows the 95\% confidence interval around the mean. Notice that the scales in the y-axis are not shared to allow for better zoom in each figure, comparing the performance across models is not the objective of this study. Details like the shades are better viewed in a screen.}
 	\label{fig:training_curves}
 \end{figure}
 
@@ -272,7 +272,7 @@ Figure \ref{fig:training_curves} shows the average training curves for the 12 ex
 
 
 \begin{table}[hp!] \footnotesize  \setlength{\tabcolsep}{3pt}
-	\caption{Accuracy comparison for the soft approximations of the \textit{modulus} function, compared with the original \textit{modulus} definition. The results are expressed as mean $\pm$ standard deviation across the 30 random initializations. The models with highest accuracy are highlighted in bold. A star is added to those cases where a \textit{SoftModulus} activation function achieved significantly higher results than the \textit{modulus}, with a significance level of $\alpha=0.05$.}
+	\caption[Accuracy comparison for the soft approximations of the \textit{modulus}]{Accuracy comparison for the soft approximations of the \textit{modulus} function, compared with the original \textit{modulus} definition. The results are expressed as mean $\pm$ standard deviation across the 30 random initializations. The models with highest accuracy are highlighted in bold. A star is added to those cases where a \textit{SoftModulus} activation function achieved significantly higher results than the \textit{modulus}, with a significance level of $\alpha=0.05$.}
 	\centering
 	\begin{tabular}{rrcccc}
 		\toprule
@@ -295,7 +295,7 @@ Figure \ref{fig:training_curves} shows the average training curves for the 12 ex
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1.0\linewidth]{modulus/images/training_curves_smooth}
-	\caption{Training curves smooth approximations compared with the \textit{modulus}. Each line represents the average accuracy of 30 runs of a model. The shade behind to each line shows the 95\% confidence interval around the mean. Notice that the scales in the y-axis are not shared to allow for better zoom in each figure, comparing the performance across models is not the objective of this study. Details like the shades are better viewed in a screen.}
+	\caption[Training curves for the smooth approx. of the \textit{modulus} function]{Training curves smooth approximations compared with the \textit{modulus}. Each line represents the average accuracy of 30 runs of a model. The shade behind to each line shows the 95\% confidence interval around the mean. Notice that the scales in the y-axis are not shared to allow for better zoom in each figure, comparing the performance across models is not the objective of this study. Details like the shades are better viewed in a screen.}
 	\label{fig:training_curves_smooth}
 \end{figure}
 

@@ -90,7 +90,7 @@ Along all the chapter, $\alpha$ is set to $1$ given that only unlabeled data is 
  \begin{figure}[hbt]
  
   \includegraphics[width=1.0\linewidth]{./distillation/images/inception.pdf}
-  \caption{Building block of inception architecture \autocite{szegedy2015}. Left: inception block without the dimensionality reduction trick. Right: inception block with convolutions 1D to reduce the total amount of operations.}
+  \caption[Inception architecture building block]{Building block of inception architecture \autocite{szegedy2015}. Left: inception block without the dimensionality reduction trick. Right: inception block with convolutions 1D to reduce the total amount of operations.}
   \label{fig:inception}
 \end{figure}
 
@@ -98,7 +98,7 @@ Along all the chapter, $\alpha$ is set to $1$ given that only unlabeled data is 
 
  \begin{table}[h]
 	 \small
-	 \caption{Pre-trained models used as teachers along this study, taken from \textit{Keras} implementations. Some of the input resolutions shown in the table may not correspond to the resolutions of the original papers, the models have been run in the resolutions indicated in the table as they showed a substantial performance improvement. The performance metrics reported in the table are empirical accuracies obtained by measuring the performance of the models against the \textit{ImageNet} 2012 validation dataset, using the \textit{Keras} implementations. They may differ from the performance reported in the original studies. $m$ means millions ($10^6$) and b means billions ($10^9$). The models that were used as students are formatted in bold.}
+	 \caption[List of pre-trained models used in the experiments]{Pre-trained models used as teachers along this study, taken from \textit{Keras} implementations. Some of the input resolutions shown in the table may not correspond to the resolutions of the original papers, the models have been run in the resolutions indicated in the table as they showed a substantial performance improvement. The performance metrics reported in the table are empirical accuracies obtained by measuring the performance of the models against the \textit{ImageNet} 2012 validation dataset, using the \textit{Keras} implementations. They may differ from the performance reported in the original studies. $m$ means millions ($10^6$) and b means billions ($10^9$). The models that were used as students are formatted in bold.}
 	 \centering
  \begin{tabular}{c|ccc|cc}
 	 \toprule
@@ -141,7 +141,7 @@ Several experiments have been conducted to prove that the methodology described 
 \begin{figure}[h!]
  \centering
  \includegraphics[width=0.6\linewidth]{distillation/images/schema}
- \caption{Schema representing the combination of techniques tested in this study.}
+ \caption[Distillation expriments summary schema]{Schema representing the combination of techniques tested in this study.}
  \label{fig:schema}
 \end{figure}
 
@@ -171,7 +171,7 @@ Choosing a very small learning rate was crucial to achieve the performance repor
   \tiny
  \centering
  \setlength{\tabcolsep}{4pt}
- \caption{Results in top-1 and top-5 accuracy (\%) for all the experiments. Each column in the table represents a different teacher set. The experiment that achieved the best performance for each student is highlighted in bold, a star symbol is added $\star$ in case the difference is significant with respect to the original accuracy with $\alpha=0.05$ (as per a one-sided one-sample t-test conducted separately for the Top-1 and Top-5 accuracy results). A second star symbol distinguishes the experiments that significantly beat the distillation with the best teacher (as per a one-sided two-samples t-test with $\alpha=0.05$)}.
+ \caption[Accuracy results of the distillation expriments]{Results in top-1 and top-5 accuracy (\%) for all the experiments. Each column in the table represents a different teacher set. The experiment that achieved the best performance for each student is highlighted in bold, a star symbol is added $\star$ in case the difference is significant with respect to the original accuracy with $\alpha=0.05$ (as per a one-sided one-sample t-test conducted separately for the Top-1 and Top-5 accuracy results). A second star symbol distinguishes the experiments that significantly beat the distillation with the best teacher (as per a one-sided two-samples t-test with $\alpha=0.05$)}.
  \begin{tabularx}{\textwidth}{XX|YY|YY}
 	 \toprule
 									&                          &                     \multicolumn{2}{c}{Top 1 accuracy}                      & \multicolumn{2}{|c}{Top 5 accuracy}                                       \\
@@ -216,7 +216,7 @@ Choosing a very small learning rate was crucial to achieve the performance repor
 	 \includegraphics[width=0.475\linewidth]{distillation/images/top1_accuracy}
 	 \includegraphics[width=0.475\linewidth]{distillation/images/top5_accuracy}
 	 \includegraphics[width=0.95\linewidth]{distillation/images/legend}
-	 \caption{Absolute difference of top-1 accuracy (left) and top-5 accuracy (right) with respect to the baseline. The x-axis represents the number of training epochs, and the y-axis shows the absolute difference in performance with respect to the baseline. Each row in the grid represents a different student model. For comparison purposes, the training curve of the student trained by distilling the knowledge of the best teacher is included as a black line.}
+	 \caption[Training curves of the distillation processes]{Absolute difference of top-1 accuracy (left) and top-5 accuracy (right) with respect to the baseline. The x-axis represents the number of training epochs, and the y-axis shows the absolute difference in performance with respect to the baseline. Each row in the grid represents a different student model. For comparison purposes, the training curve of the student trained by distilling the knowledge of the best teacher is included as a black line.}
 	 \label{fig:accuracycurves}
  \end{figure}
  
@@ -240,7 +240,7 @@ This chapter shows how it is possible to improve current low-resource pre-traine
 	 \tiny. 
 	 \centering
 	 \setlength{\tabcolsep}{3pt}
-	 \caption{Results in top-1 and top-5 accuracy (\%) comparing the original ``min entropy'' and ``max correlation'' methods with their opposite counterparts. In each comparison, the method that achieved the maximum accuracy is highlighted in bold, and a star symbol $\star$ is added where the difference was statistically significant with $\alpha=0.05$ (as per a one-sided two-sampled t-test).}
+	 \caption[Results of the min/max entropy and correlation methods]{Results in top-1 and top-5 accuracy (\%) comparing the original ``min entropy'' and ``max correlation'' methods with their opposite counterparts. In each comparison, the method that achieved the maximum accuracy is highlighted in bold, and a star symbol $\star$ is added where the difference was statistically significant with $\alpha=0.05$ (as per a one-sided two-sampled t-test).}
 	 \begin{tabularx}{\textwidth}{rr|YY|YY}
 		 \toprule
 						   &                         &              \multicolumn{2}{c}{Top 1 accuracy}              & \multicolumn{2}{|c}{Top 5 accuracy}                                    \\
@@ -291,7 +291,7 @@ The experiments of this chapter show how by using simple knowledge distillation 
 	 \includegraphics[width=0.475\linewidth]{distillation/images/top1_accuracy_challenging_assumptions}
 	 \includegraphics[width=0.475\linewidth]{distillation/images/top5_accuracy_challenging_assumptions}
 	 \includegraphics[width=0.95\linewidth]{distillation/images/legend_challenging_assumptions}
-	 \caption{Absolute difference of top-1 accuracy (left) and top-5 accuracy (right) with respect to the baseline. The x-axis represents the number of training epochs, and the y-axis shows the absolute difference in performance with respect to the baseline. Each row in the grid represents a different student model.}
+	 \caption[Training curves of the min/max entropy and correlation methods]{Absolute difference of top-1 accuracy (left) and top-5 accuracy (right) with respect to the baseline. The x-axis represents the number of training epochs, and the y-axis shows the absolute difference in performance with respect to the baseline. Each row in the grid represents a different student model.}
 	 \label{fig:accuracycurves_challenging_assumptions}
  \end{figure}
 

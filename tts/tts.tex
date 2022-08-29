@@ -41,7 +41,7 @@ The proposed architecture builds upon the baseline model, removing the dependenc
 
 	\includegraphics[width=1.0\linewidth]{tts/images/proposed_architecture}
 
-	\caption{Top: the baseline architecture. Bottom: the proposed architecture. The blue blocks represent pre-trained parts of the network and the blocks with round corners are tensor operations.}
+	\caption[TTS baseline vs proposed architectures]{Top: the baseline architecture. Bottom: the proposed architecture. The blue blocks represent pre-trained parts of the network and the blocks with round corners are tensor operations.}
 	\label{fig:architectures}
 \end{figure}
 
@@ -90,7 +90,7 @@ The output of the phonetic encoder $\mathbf{h_{\text{ph}}}$ is piped into a bidi
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.7\linewidth]{tts/images/wer}
-	\caption{Speaker intelligibility of the baseline and residual models, measured as word error rate of the target and the transcribed synthesis, showing a slightly smaller error for the proposed architecture (Wilcoxon's $p=0.0305$). The solid lines represent a kernel density estimate (KDE) over the histograms.}
+	\caption[Speaker intelligibility curves for the TTS models]{Speaker intelligibility of the baseline and residual models, measured as word error rate of the target and the transcribed synthesis, showing a slightly smaller error for the proposed architecture (Wilcoxon's $p=0.0305$). The solid lines represent a kernel density estimate (KDE) over the histograms.}
 	\label{fig:wer}
 \end{figure}
 
@@ -107,13 +107,13 @@ To measure how distinct the synthesized speakers are, \textit{Alexa}'s internal 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=.7\linewidth]{tts/images/far}
-	\caption{false acceptance rate distribution at different \textit{speaker verification model} thresholds.}
+	\caption[False acceptance rates for the TTS models]{false acceptance rate distribution at different \textit{speaker verification model} thresholds.}
 	\label{fig:far}
 \end{figure}
 
 \begin{table}[h]
 	\centering
-	\caption{false acceptance rate metric for different thresholds}
+	\caption[False acceptance rates for different thresholds of the TTS models]{false acceptance rate metric for different thresholds}
 	\footnotesize
 	\begin{tabular}{ccc}
 		\toprule
@@ -139,7 +139,7 @@ To measure how much prosody and quality variance the new model introduces with r
 \begin{table*}[h!]
 	\scriptsize
 		\centering
-	\caption{Metrics used to quantify the prosody variation and quality across different models.}
+	\caption[Summary of prosody variability metrics for TTS models]{Metrics used to quantify the prosody variation and quality across different models.}
 	\begin{tabular}{p{0.1\textwidth}|p{0.8\textwidth}}
 		\toprule
 		Metric & Description \\
@@ -167,7 +167,7 @@ For the comparison, as the focus of this study is to measure differences of vari
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.7\linewidth]{tts/images/wilcoxon}
-	\caption{Baseline model vs proposed model when sampling from the residual latent distribution (blue) or from the speaker embedding distribution (orange), keeping the other constant. The results are represented as proportion of speaker-sentence pairs for which the proposed model shows significantly higher variance than the baseline, for each of the previously defined prosody features.}
+	\caption[Comparison of prosody variability between TTS models]{Baseline model vs proposed model when sampling from the residual latent distribution (blue) or from the speaker embedding distribution (orange), keeping the other constant. The results are represented as proportion of speaker-sentence pairs for which the proposed model shows significantly higher variance than the baseline, for each of the previously defined prosody features.}
 	\label{fig:wilcoxon}
 \end{figure}
 
@@ -184,7 +184,7 @@ The proposed model and the baseline are tested using interpolated speakers to st
 	\includegraphics[width=0.7\linewidth]{tts/images/far_svps}
 
 	\includegraphics[width=0.7\linewidth]{tts/images/wer_svps}
-	\caption{Top: false acceptance rate distribution at different speaker verification thresholds, for all the interpolated speakers. Bottom: speaker intelligibility of the baseline and residual models, measured as word error rate of the target and the transcribed synthesis, showing a slightly smaller error for the baseline architecture (Wilcoxon's $p=5.2263\cdot 10^{-6}$). The solid lines represent a KDE over the histograms.}
+	\caption[Speaker interpolation results for the TTS models]{Top: false acceptance rate distribution at different speaker verification thresholds, for all the interpolated speakers. Bottom: speaker intelligibility of the baseline and residual models, measured as word error rate of the target and the transcribed synthesis, showing a slightly smaller error for the baseline architecture (Wilcoxon's $p=5.2263\cdot 10^{-6}$). The solid lines represent a KDE over the histograms.}
 	\label{fig:svps}
 \end{figure}
 

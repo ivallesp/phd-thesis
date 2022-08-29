@@ -40,7 +40,7 @@ As it is usual in the supply chain organizations, the distribution of sales acro
 	\centering
 	\includegraphics[width=0.48\linewidth]{salesforecast/images/items_tail_log}
 	\includegraphics[width=0.48\linewidth]{salesforecast/images/stores_tail_log}
-	\caption{Long tail distributions for items (left) and stores (right). Y axes represent total sells across all the history (around 5 years).}
+	\caption[Long tail distributions of sales across items and stores]{Long tail distributions for items (left) and stores (right). Y axes represent total sells across all the history (around 5 years).}
 	\label{fig:tails}
 \end{figure}
 
@@ -49,14 +49,14 @@ As it can be noticed in Figure \ref{fig:timeseries}, the total sales show clear 
  	\begin{figure}
  	\centering
  	\includegraphics[width=1\textwidth]{salesforecast/images/timeseries}
- 	\caption{Daily total sales for the 5 years included in the data.}
+ 	\caption[Daily total sales for the 5 years included in the data]{Daily total sales for the 5 years included in the data.}
  	\label{fig:timeseries}
 \end{figure}
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.6\textwidth]{salesforecast/images/timeseries_dow}
-	\caption{Weekly pattern detail, including the 2014 sales.}
+	\caption[Weekly sales pattern details]{Weekly pattern detail, including the 2014 sales.}
 	\label{fig:timeseries_detail}
 \end{figure}
 
@@ -83,7 +83,7 @@ The size of the dataset chosen (around $4\cdot10^8$ samples) enables the use of 
 \begin{figure}
 	\centering
 	\includegraphics[width=1\linewidth]{salesforecast/images/s2s}
-	\caption{\textit{Seq2seq} architecture diagram. The left box shows the encoder, which takes the historical actual sales $y_i$ as input as well as other exogenous time-dependent features (i.e. oil price, holidays and events, transactions and promotions) denoted by $x_i$, and returns the hidden vector $h_t$ of the last recurrent module as output (aka \textit{context vector}). The middle of the figure shows the context conditioning module, which is the variation proposal over the original sequence-to-sequence proposal. This module receives the \textit{context vector} $h_t$ from the encoder module and concatenates it with static data $\hat{x}$ producing a conditioned context vector $\hat{h}_t = (h_t, \hat{x})$. Finally, on the right, the decoder module receives as initial state the conditioned context vector and provides the first recurrent cell with a \textit{go symbol} (constant input indicating the input of the decoded sequence). The decoder generates the sequence prediction in an auto-regressive way and $f$ is a stack of two fully-connected layers applied to each output of the decoder.}
+	\caption[Diagram of the \textit{seq2seq} architecture]{\textit{Seq2seq} architecture diagram. The left box shows the encoder, which takes the historical actual sales $y_i$ as input as well as other exogenous time-dependent features (i.e. oil price, holidays and events, transactions and promotions) denoted by $x_i$, and returns the hidden vector $h_t$ of the last recurrent module as output (aka \textit{context vector}). The middle of the figure shows the context conditioning module, which is the variation proposal over the original sequence-to-sequence proposal. This module receives the \textit{context vector} $h_t$ from the encoder module and concatenates it with static data $\hat{x}$ producing a conditioned context vector $\hat{h}_t = (h_t, \hat{x})$. Finally, on the right, the decoder module receives as initial state the conditioned context vector and provides the first recurrent cell with a \textit{go symbol} (constant input indicating the input of the decoded sequence). The decoder generates the sequence prediction in an auto-regressive way and $f$ is a stack of two fully-connected layers applied to each output of the decoder.}
 	\label{fig:s2s}
 \end{figure}
 
@@ -119,7 +119,7 @@ At inference time, \textit{teacher forcing} is no longer available (because the 
 \begin{figure}[h!]
    	\centering
    	\includegraphics[width=0.7\linewidth]{salesforecast/images/transformer}
-   	\caption{Transformer architecture used to perform time series forecasting. In the diagram, the $||$ symbol stands for the concatenation operation, and similarly as in \autocite{vaswani2017}, $N_X$ represents the number of repetitions of the encoder and decoder blocks.}
+   	\caption[Diagram of the \textit{transformer} architecture]{Transformer architecture used to perform time series forecasting. In the diagram, the $||$ symbol stands for the concatenation operation, and similarly as in \autocite{vaswani2017}, $N_X$ represents the number of repetitions of the encoder and decoder blocks.}
    	\label{fig:salesforecast_transformer}
 \end{figure}
 
@@ -160,7 +160,7 @@ Figure \ref{fig:performance_evolution} shows how the errors evolve in every epoc
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\linewidth]{salesforecast/images/evolution}
-	\caption{Evolution of the train and validation (dev) error during the process of training, for all the models.}
+	\caption[Evolution of the train and validation errors]{Evolution of the train and validation (dev) error during the process of training, for all the models.}
 	\label{fig:performance_evolution}
 \end{figure}
 
@@ -168,7 +168,7 @@ Figure \ref{fig:performance_evolution} shows how the errors evolve in every epoc
 	\centering
 	\includegraphics[width=0.48\linewidth]{salesforecast/images/rmsle_storewise}
 	\includegraphics[width=0.48\linewidth]{salesforecast/images/rmsle_itemwise}
-	\caption{Distribution of the error across stores (left) and accross items (right) for every model  and for the three different test periods used.}
+	\caption[Error distributions across stores and items]{Distribution of the error across stores (left) and accross items (right) for every model  and for the three different test periods used.}
 	\label{fig:stores_items_performance}
 \end{figure}
 
@@ -180,7 +180,7 @@ Figure \ref{fig:performance_evolution} shows how the errors evolve in every epoc
 	\includegraphics[width=1\linewidth]{salesforecast/images/sample_3_log}
 	\includegraphics[width=1\linewidth]{salesforecast/images/sample_4_log}
 	\includegraphics[width=1\linewidth]{salesforecast/images/sample_5_log}
-\caption{Actual and forecasted sales in log scale for six examples of store-item combinations representing the 0th (best prediction), 1st, 2nd, 5th 15th and 50th percentiles of RMSLE (relative to the target variable average) from top to bottom. The three test periods have been concatenated along the X axis. The error bars show the standard deviation across the 5 runs. }
+\caption[Actual and forecasted sales timeseries examples in log scale]{Actual and forecasted sales in log scale for six examples of store-item combinations representing the 0th (best prediction), 1st, 2nd, 5th 15th and 50th percentiles of RMSLE (relative to the target variable average) from top to bottom. The three test periods have been concatenated along the X axis. The error bars show the standard deviation across the 5 runs. }
 	\label{fig:ts_log}
 \end{figure}
 
@@ -192,7 +192,7 @@ Figure \ref{fig:performance_evolution} shows how the errors evolve in every epoc
 \includegraphics[width=1\linewidth]{salesforecast/images/sample_3_lin}
 \includegraphics[width=1\linewidth]{salesforecast/images/sample_4_lin}
 \includegraphics[width=1\linewidth]{salesforecast/images/sample_5_lin}
-\caption{Actual and forecasted sales in linear scale for six examples of store-item combinations representing the 0th (best prediction), 1st, 2nd, 5th 15th and 50th percentiles of RMSLE (relative to the target variable average) from top to bottom. The three test periods have been concatenated along the X axis. The error bars show the standard deviation across the 5 runs. Some of the examples are better viewed in log-scale (refer to figure \ref{fig:ts_log}).}
+\caption[Actual and forecasted sales timeseries examples in linear scale]{Actual and forecasted sales in linear scale for six examples of store-item combinations representing the 0th (best prediction), 1st, 2nd, 5th 15th and 50th percentiles of RMSLE (relative to the target variable average) from top to bottom. The three test periods have been concatenated along the X axis. The error bars show the standard deviation across the 5 runs. Some of the examples are better viewed in log-scale (refer to figure \ref{fig:ts_log}).}
 \label{fig:ts_lin}
 \end{figure}
 
@@ -203,7 +203,7 @@ Table \ref{tab:salesforecast_results} shows that the three models perform simila
 
 \begin{table}[h]
 \scriptsize
-\caption{Results of the models trained for three different time spans. All the models have been trained five times to reduce the effect of different random initialization. The errors are represented as mean $\pm$ standard deviation, across the five runs. The rows corresponding with the models that achieved the lowest RMSLE have been highlighted in bold. At the bottom of the table two benchmark metrics extracted from the previous works have been included. However, the authors of those works do not clearly specify the period of time used to measure the results, hence they should be used only as a reference.}
+\caption[Results of the models trained for three different time spans.]{Results of the models trained for three different time spans. All the models have been trained five times to reduce the effect of different random initialization. The errors are represented as mean $\pm$ standard deviation, across the five runs. The rows corresponding with the models that achieved the lowest RMSLE have been highlighted in bold. At the bottom of the table two benchmark metrics extracted from the previous works have been included. However, the authors of those works do not clearly specify the period of time used to measure the results, hence they should be used only as a reference.}
 	\label{tab:salesforecast_results}
 	\centering
 	\begin{tabular}{lllll}
@@ -235,7 +235,7 @@ Table \ref{tab:salesforecast_results} shows that the three models perform simila
 \includegraphics[width=1\linewidth]{salesforecast/images/lag3_daily_error}
 \includegraphics[width=1\linewidth]{salesforecast/images/lag2_daily_error}
 \includegraphics[width=1\linewidth]{salesforecast/images/lag1_daily_error}
-\caption{Daily \textit{RMSLE} for the three test periods (in chronological order, from top to bottom). The error bars shown in the figures represent the standard deviation of the three runs. Despite the error spikes in the 2nd day of the forecast, an ANOVA test shows non-significant differences between the average performance of the three models (with the following p-values: 0.0947, 0.1823 and 0.6181 for periods 1, 2 and 3, respectively). }
+\caption[Daily sales \textit{RMSLE} for the three test periods]{Daily \textit{RMSLE} for the three test periods (in chronological order, from top to bottom). The error bars shown in the figures represent the standard deviation of the three runs. Despite the error spikes in the 2nd day of the forecast, an ANOVA test shows non-significant differences between the average performance of the three models (with the following p-values: 0.0947, 0.1823 and 0.6181 for periods 1, 2 and 3, respectively). }
 \label{fig:dailyerror}
 \end{figure}
 
@@ -248,7 +248,7 @@ The \textit{seq2seq trimmed} model is retrained without the \textit{random max t
 
 	\begin{table}[h]
 	\footnotesize
-	\caption{Results of the models trained with and without the \textit{random max time step trick}. All the models have been trained five times to reduce the effect of different random initialization. The errors are represented as mean $\pm$ standard deviation, across the five runs. The rows corresponding with the models that achieved the lowest RMSLE have been highlighted in bold.}
+	\caption[Results for the \textit{random max time step trick} ablation study]{Results of the models trained with and without the \textit{random max time step trick}. All the models have been trained five times to reduce the effect of different random initialization. The errors are represented as mean $\pm$ standard deviation, across the five runs. The rows corresponding with the models that achieved the lowest RMSLE have been highlighted in bold.}
 	\label{tab:salesforecast_results_notrick}
 	\centering
 	\begin{tabular}{lllll}
@@ -270,7 +270,7 @@ The \textit{seq2seq trimmed} model is retrained without the \textit{random max t
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.7\linewidth]{salesforecast/images/train_curves_notrick}
-	\caption{Training and validation MALE curves of the \textit{seq2seq trimmed} when using the \textit{random max time step trick} and when disabling it.}
+	\caption[Training and validation sales \textit{MALE} curves]{Training and validation \textit{MALE} curves of the \textit{seq2seq trimmed} when using the \textit{random max time step trick} and when disabling it.}
 	\label{fig:traincurvesnotrick}
 \end{figure}
 
@@ -281,7 +281,7 @@ The results show that it is possible to reduce the sequence lengths to up to 75 
 
 	\begin{table}[h]
 	\footnotesize
-	\caption{Results of the \textit{seq2seq} models trained with different input sequence lengths. All the models have been trained five times to reduce the effect of different random initialization. The errors are represented as mean $\pm$ standard deviation, across the five runs. The rows corresponding with the models that achieved the lowest RMSLE have been highlighted. An asterisk is added to the experiments where the metric is significantly different than the full sequence error (as per a two-tail T-test with $\alpha=0.05$)}
+	\caption[Results for the sequence length ablation study]{Results of the \textit{seq2seq} models trained with different input sequence lengths. All the models have been trained five times to reduce the effect of different random initialization. The errors are represented as mean $\pm$ standard deviation, across the five runs. The rows corresponding with the models that achieved the lowest RMSLE have been highlighted. An asterisk is added to the experiments where the metric is significantly different than the full sequence error (as per a two-tail T-test with $\alpha=0.05$)}
 	\label{tab:salesforecast_results_ablation_length}
 	\centering
 	\begin{tabular}{lllll}

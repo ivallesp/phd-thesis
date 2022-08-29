@@ -39,7 +39,7 @@ Two different versions of the \textit{Google Tensorflow speech commands dataset}
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.45\linewidth]{kws/images/freqdist_data}
-	\caption{Command frequency distribution for both versions of the dataset. The V2 is a refined and extended version of V1. In the left, the four different tasks that have been benchmarked in this work: (a) referred as \textit{35-words-recognition} and comprising in both cases all the words for classification, (b) referred as \textit{20-commands-recognition}  (c) referred as \textit{10-commands-recognition} (d) referred as \textit{left-right} recognition.}
+	\caption[Speech commands frequency distribution]{Command frequency distribution for both versions of the dataset. The V2 is a refined and extended version of V1. In the left, the four different tasks that have been benchmarked in this work: (a) referred as \textit{35-words-recognition} and comprising in both cases all the words for classification, (b) referred as \textit{20-commands-recognition}  (c) referred as \textit{10-commands-recognition} (d) referred as \textit{left-right} recognition.}
 	\label{fig:freqdistdata}
 \end{figure}
 
@@ -120,7 +120,7 @@ While it is true that, as more unrecognized words are grouped under the ``unknow
 
 \begin{table}[ht]
 	\centering
-	\caption{Percentage of words represented by the ``unknown'' category in each one of the proposed speech recognition tasks. }
+	\caption[Percentage of ``unknown'' speech commands in each task]{Percentage of words represented by the ``unknown'' category in each one of the proposed speech recognition tasks. }
 	\label{tab:unknowns}
 	\begin{tabular}{lcccc}
 		\hline
@@ -165,7 +165,7 @@ A \textit{depthwise-separable convolution} performs an operation which, given an
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=1\linewidth]{kws/images/dws_conv_new}
-	\caption{\textit{Depthwise-separable convolution} diagram showing how the whole computation is done in two steps: the \textit{depthwise convolution} followed by the \textit{pointwise convolution}.}
+	\caption[\textit{Depthwise-separable convolution} diagram]{\textit{Depthwise-separable convolution} diagram showing how the whole computation is done in two steps: the \textit{depthwise convolution} followed by the \textit{pointwise convolution}.}
 	\label{fig:dwsconv}
 \end{figure}
 
@@ -213,7 +213,7 @@ The \textit{Xception-1d} architecture is shown in Figure \ref{fig:arch}. It has 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=1.0\linewidth]{kws/images/arch.eps}
-	\caption{Diagram of the architecture used in this work where $n$ refers to the number of channels, $s$ is the stride of the convolutions (which in the case of the \textit{Xception-1d blocks} is applied through the final pooling operation), $m$ is the size of the convolution filters, $n_{mod}$ is the number of the \textit{depthwise convolutional} layers stacked in the \textit{Xception-1d blocks} (see Figure \ref{fig:xceptionmodule}) and $n_{classes}$ is the number of outputs of the network (i.e. the number of classes to predict, which depends on the task being solved). The architecture is built up in 3 main modules: (a) the entry module is the part of the network responsible for adapting the input wave into a condensed representation (by applying strides after each operation), (b) the middle module is responsible for learning the representation extracting the useful features that will allow the next module to distinguish between classes and (c) the classification module is responsible for mapping the extracted features into the number of outputs required for every task.}
+	\caption[\textit{Xception-1d} architecture]{Diagram of the architecture used in this work where $n$ refers to the number of channels, $s$ is the stride of the convolutions (which in the case of the \textit{Xception-1d blocks} is applied through the final pooling operation), $m$ is the size of the convolution filters, $n_{mod}$ is the number of the \textit{depthwise convolutional} layers stacked in the \textit{Xception-1d blocks} (see Figure \ref{fig:xceptionmodule}) and $n_{classes}$ is the number of outputs of the network (i.e. the number of classes to predict, which depends on the task being solved). The architecture is built up in 3 main modules: (a) the entry module is the part of the network responsible for adapting the input wave into a condensed representation (by applying strides after each operation), (b) the middle module is responsible for learning the representation extracting the useful features that will allow the next module to distinguish between classes and (c) the classification module is responsible for mapping the extracted features into the number of outputs required for every task.}
 	\label{fig:arch}
 \end{figure}
 
@@ -221,7 +221,7 @@ The \textit{Xception-1d} architecture is shown in Figure \ref{fig:arch}. It has 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.4\linewidth]{kws/images/xception_module.eps}
-	\caption{Neural network module refered as \textit{Xception-1d block}. The \textit{Xception-1d block} represents the building block of the architecture proposed in this work. It consists of a set of $n_{mod}$ \textit{1-D depthwise-separable convolution} layers with a \textit{residual connection} and with a \textit{1-D average pooling} layer at the end. The activation function used is the \textit{rectified linear unit} (ReLU) and the normalization procedure after each convolutional layer is the \textit{instance normalization} for one dimensional sequence.}
+	\caption[\textit{Xception-1d} architecture building block]{Neural network module refered as \textit{Xception-1d block}. The \textit{Xception-1d block} represents the building block of the architecture proposed in this work. It consists of a set of $n_{mod}$ \textit{1-D depthwise-separable convolution} layers with a \textit{residual connection} and with a \textit{1-D average pooling} layer at the end. The activation function used is the \textit{rectified linear unit} (ReLU) and the normalization procedure after each convolutional layer is the \textit{instance normalization} for one dimensional sequence.}
 	\label{fig:xceptionmodule}
 \end{figure}
 
@@ -238,7 +238,7 @@ Considering that the last dense layer can be prone to overfitting due to the hig
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.7\linewidth]{kws/images/normcubes}
-	\caption{Each cube represents a batch of data where $B$ is the instances axis (with the batch size), $M$ is the channels axis and $D$ is the spatial/temporal dimension. (a) represents \textit{batch normalization}, (b) is \textit{instance normalization} and (c) shows \textit{layer normalization}. The shaded areas in the cubes represent the dimensions that are aggregated in each case for computing the statistics used to normalize the data (generally the mean and the standard deviation). As it can be noticed, the only normalization technique that depends on instances of data in the batch is the \textit{batch normalization}, that is why it is more sensitive to train-test distribution differences. As it can be noticed in the picture, \textit{instance normalization} is a specific version of \textit{layer normalization} where each channel is normalized separately.}
+	\caption[Batch, instance and layer normalization diagrams]{Each cube represents a batch of data where $B$ is the instances axis (with the batch size), $M$ is the channels axis and $D$ is the spatial/temporal dimension. (a) represents \textit{batch normalization}, (b) is \textit{layer normalization} and (c) shows \textit{instance normalization}. The shaded areas in the cubes represent the dimensions that are aggregated in each case for computing the statistics used to normalize the data (generally the mean and the standard deviation). As it can be noticed, the only normalization technique that depends on instances of data in the batch is the \textit{batch normalization}, that is why it is more sensitive to train-test distribution differences. As it can be noticed in the picture, \textit{instance normalization} is a specific version of \textit{layer normalization} where each channel is normalized separately.}
 	\label{fig:normcubes}
 \end{figure}
 
@@ -259,7 +259,7 @@ Besides the global results, figure \ref{fig:boxplot35002} shows the precision an
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=1.0\linewidth]{kws/images/boxplot_35-words-recognition_002.eps}
-	\caption{Precision and recall for each of the different classes using the \textit{35-words-recognition} model trained with data version V2. Classes are sorted by descending f1-score.}
+	\caption[Speech commands precision-recall for \textit{35-words-recognition} task]{Precision and recall for each of the different classes using the \textit{35-words-recognition} model trained with data version V2. Classes are sorted by descending f1-score.}
 	\label{fig:boxplot35002}
 \end{figure}
 
@@ -268,7 +268,7 @@ Besides the global results, figure \ref{fig:boxplot35002} shows the precision an
 
 \begin{table}[h!]
 	\centering
-	\caption{Accuracy (mean $\pm$ standard deviation) obtained by the proposed solution on the different tasks compared to other benchmark algorithms (described in \autocite{Andrade2018, Mcmahan2017, Warden2018,Zhang2017}) and compared to the measurement of human accuracy (through 4 manual evaluations). The results of best performing algorithms for each task have been highlighted in bold in each case. Results better than human performance (given a statistical significance level of $\alpha = 0.05$) have been tagged with a star mark (*).}
+	\caption[Speech commands recognition accuracy for dataset v1]{Accuracy (mean $\pm$ standard deviation) obtained by the proposed solution on the different tasks compared to other benchmark algorithms (described in \autocite{Andrade2018, Mcmahan2017, Warden2018,Zhang2017}) and compared to the measurement of human accuracy (through 4 manual evaluations). The results of best performing algorithms for each task have been highlighted in bold in each case. Results better than human performance (given a statistical significance level of $\alpha = 0.05$) have been tagged with a star mark (*).}
 	\label{tab:comparative}
 
 
@@ -323,7 +323,7 @@ A possible future line of work could be  the use of \textit{Xception-1d} archite
 
 
 \begin{table}[h!] \centering \scriptsize
-	\caption{Detailed results for task \textit{left-right} and data version V2, sorted by decreasing f1-score order. The columns ``precision'', ``recall'' and ``f1-score'' have been represented as the mean $\pm$ the standard deviation in percentage scale. } \label{tab:kwsperclassresults2}
+	\caption[Speech commands precision-recall for \textit{left-right} task]{Detailed results for task \textit{left-right} and data version V2, sorted by decreasing f1-score order. The columns ``precision'', ``recall'' and ``f1-score'' have been represented as the mean $\pm$ the standard deviation in percentage scale. } \label{tab:kwsperclassresults2}
 	\begin{tabular}{lcccc}
 		\toprule
 		{} &       precision &           recall &         f1-score & support \\
@@ -336,7 +336,7 @@ A possible future line of work could be  the use of \textit{Xception-1d} archite
 \end{table}
 
 \begin{table}[h!] \centering \scriptsize
-	\caption{Detailed results for task \textit{35-words-recognition} and V2 dataset, in decreasing f1-score order. The columns ``precision'', ``recall'' and ``f1-score'' have been represented as the mean $\pm$ the standard deviation in percentage scale. } \label{tab:kwsperclassresults35}
+	\caption[Speech commands precision-recall for \textit{35-words-recognition} task]{Detailed results for task \textit{35-words-recognition} and V2 dataset, in decreasing f1-score order. The columns ``precision'', ``recall'' and ``f1-score'' have been represented as the mean $\pm$ the standard deviation in percentage scale. } \label{tab:kwsperclassresults35}
 	\begin{tabular}{lcccc}
 		\toprule
 		{} &       precision &          recall &        f1-score & support \\
