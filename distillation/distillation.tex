@@ -75,7 +75,9 @@ Along all the chapter, $\alpha$ is set to $1$ given that only unlabeled data is 
  The techniques described above can be categorized in aggregative and selective technique depending on their operating principle. The ``mean'' and ``median'' techniques are considered aggregative techniques because for a given training example $x_i$, they merge information from different teachers to get the final soft-target probabilities. The ``random'', ``maximum correlation'' and ``minimum entropy'' are categorized as selective techniques given that for a training example $x_i$, they just select which teacher provides the soft-target signal.  
 
  \subsection{Pre-trained models}
- Some of the pre-trained models included in the \textit{Keras} library for \textit{Python} \autocite{chollet2015keras} have been used along this study. One model from each family is selected, excluding the VGG group in favour of more modern and efficient alternatives. A short description about each of those architectures is included below. Further details, including the number of parameters and the computational cost of each model, are included in table \ref{table:models}.
+ Some of the pre-trained models included in the \textit{Keras} library for \textit{Python} \autocite{chollet2015keras} have been used for the experiments presented in this chapter. One model from each family has been selected, excluding the VGG family of models, in favour of more modern and efficient alternatives. A short description about each of those architectures is included below.
+ 
+  In order to select the pre-trained models that will be used as students, a combination of the number of parameters and accuracy obtained on the transfer dataset (with the original model parameters) has been used. Further details, including the number of parameters and the computational cost of each model, are included in table \ref{table:models}.
 
  \begin{enumerate}
 	 \item \textit{ResNet} \autocite{kaiming2016}: convolutional neural network with multiple blocks where the output of the $l^{th}$ layer is added to the output of the $(l+1)^{th}$. This structure is known as \textit{residual connection} (or \textit{skip connection}), and leads to the following transition: $x_{l+1} = H_{l+1}(x_{l}) + x_l$, where $H$ represents a convolutional layer. Described in the section \ref{sec:deepernn}.
@@ -93,7 +95,6 @@ Along all the chapter, $\alpha$ is set to $1$ given that only unlabeled data is 
   \caption[Inception architecture building block]{Building block of inception architecture \autocite{szegedy2015}. Left: inception block without the dimensionality reduction trick. Right: inception block with convolutions 1D to reduce the total amount of operations.}
   \label{fig:inception}
 \end{figure}
-
 
 
  \begin{table}[h]

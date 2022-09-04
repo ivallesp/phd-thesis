@@ -15,6 +15,13 @@
 % Change captions font size
 \usepackage[font=footnotesize,labelfont=bf]{caption}
 
+% Tweak TOC
+ % Add dots after sections
+ \usepackage{tocloft}
+ \renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+
+ \usepackage{tocbibind} % to add contents and tables of figures and tables in the ToC
+
 % Hyphenation definitions
 \hyphenation{de-ve-lop-ment}
 
@@ -71,7 +78,7 @@
 	\fancyhead{} %Clean headers
 	\fancyhead[LO]{\slshape\nouppercase{\leftmark}}
 	\fancyhead[LE]{\thepage}
-	\fancyhead[RE]{\chaptername\ \thechapter}
+	\fancyhead[RE]{\ifnum\value{chapter}=0\else\chaptername\ \thechapter\ \fi}
 	\fancyhead[RO]{\thepage}
 	\fancyfoot{} %Clean headers
 	\renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{ {##1}}}{}}
@@ -100,21 +107,24 @@
 \begin{document}
 
 
+\frontmatter % Use roman numerals
 \include{titlepage/titlepage}
 
-\pagestyle{Preamble}
-\include{abstract/abstract}
-\include{acknowledgements/acknowledgements}
-
-\tableofcontents
-\clearpage
-\listoffigures
-\clearpage
-\listoftables
-\clearpage
-
 \pagestyle{MyStyle}
+\include{acknowledgements/acknowledgements}
+\include{abstract/abstract}
+\include{resumen/resumen}
+
+\cleardoubleoddpage
+\tableofcontents
+\cleardoubleoddpage
+\listoffigures
+\cleardoubleoddpage
+\listoftables
+\cleardoubleoddpage
+
 \include{notation/notation}
+\mainmatter % Use arabic numerals west
 \include{introduction/introduction}
 \include{background/background}
 \include{modulus/modulus}

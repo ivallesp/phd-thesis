@@ -35,7 +35,7 @@ Due to their architecture, convolutional neural networks (CNNs) provide a good a
 \subsection{Data set}
 One of the major contributions to the collection of open datasets in the field of speech commands recognition has been made by \textit{Google} with the release of the \textit{Google Tensorflow speech commands dataset} \autocite{speechcommands, Warden2018}. It consists of a collection of thousands of utterances with a length of one second containing short words, recorded by thousands of people. The recordings were collected remotely, in uncontrolled environments (i.e. without any specific quality requirements). The subjects were asked to say a chain of words during a minute. Then, the recordings were split in clips of one second by extracting the loudest sections of the signal \autocite{speechcommands, Warden2018}.
 
-Two different versions of the \textit{Google Tensorflow speech commands dataset} have been used for quantifying the performance of the algorithm across the different tasks, described subsequently. The versions 0.01 and 0.02 of the dataset contain 64,721 and 105,829 audio clips of one second (each one containing the recording of one voice command), respectively, with a sample rate of 16 kHz and 16-bit resolution. Each of them is stored in \textit{wav} format. The first data version has up to 30 different commands while the second one has 35 of them. The frequency distribution of the labels is described in Figure \ref{fig:freqdistdata}. For simplicity, versions 0.01 and 0.02 will be referred as as V1 and V2, respectively, from now on.
+Two different versions of the \textit{Google Tensorflow speech commands dataset} have been used for quantifying the performance of the algorithm across the different tasks, described subsequently. The versions 0.01 and 0.02 of the dataset contain 64,721 and 105,829 audio clips of one second (each one containing the recording of one voice command), respectively, with a sample rate of 16 kHz and 16-bit resolution. Each of them is stored in \textit{wav} format. The first data version has up to 30 different commands while the second one has 35 of them. The frequency distribution of the labels is described in Figure \ref{fig:freqdistdata}. For simplicity, versions 0.01 and 0.02 will be referred as V1 and V2, respectively, from now on.
 
 
 \begin{figure}[ht]
@@ -222,7 +222,7 @@ The \textit{Xception-1d} architecture is shown in Figure \ref{fig:arch}. It has 
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.4\linewidth]{kws/images/xception_module.eps}
+	\includegraphics[width=0.5\linewidth]{kws/images/xception_module.eps}
 	\caption[\textit{Xception-1d} architecture building block]{Neural network module refered as \textit{Xception-1d block}. The \textit{Xception-1d block} represents the building block of the architecture proposed in this work. It consists of a set of $n_{mod}$ \textit{1-D depthwise-separable convolution} layers with a \textit{residual connection} and with a \textit{1-D average pooling} layer at the end. The activation function used is the \textit{rectified linear unit} (ReLU) and the normalization procedure after each convolutional layer is the \textit{instance normalization} for one dimensional sequence.}
 	\label{fig:xceptionmodule}
 \end{figure}

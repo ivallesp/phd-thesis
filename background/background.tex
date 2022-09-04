@@ -182,7 +182,10 @@ This problem was originally formulated and solved by \textit{G. Cybenko} \autoci
 	$$|G(x) - f(x)| < \epsilon \quad \forall x \in I_n$$
 \end{thm}
 
-For the sake of gaining intuition (refer to \autocite{Cybenko1989} for a formal proof), let $G$ be a \textit{multilayer perceptron} with a single hidden layer, which neurons have a sigmoid activation. Assuming the weights of the hidden layer are set to a sufficiently large number, it can be easily seen that the sigmoid activations approximate a \textit{Heavyside step function} $H$ (see equation \ref{eq:sigmoidToHeavyside}, where $\delta$ represents a very large number). Then, by adding many \textit{Heavyside} functions with the proper shift and scaling, one can easily approximate any continuous function. It can be also seen that the shift and scaling operations correspond to the bias of the neurons in the hidden layer and the weights of the output layer, respectively. See figure \ref{fig:universalapprox} for a graphical example. As it can be seen, by increasing the number of neurons one can easily control the fidelity of the approximation.
+For the sake of gaining intuition (refer to \autocite{Cybenko1989} for a formal proof), let $G$ be a \textit{multilayer perceptron} with a single hidden layer, which neurons have a sigmoid activation. Assuming the weights of the hidden layer are set to a sufficiently large number, it can be easily seen that the sigmoid activations approximate a \textit{Heavyside step function} $H$ (see equation \ref{eq:sigmoidToHeavyside}, where $\delta$ represents a very large number). Then, by adding many \textit{Heavyside} functions with the proper shift and scaling, one can easily approximate any continuous function. It can be also seen that the shift and scaling operations correspond to the bias of the neurons in the hidden layer and the weights of the output layer, respectively. See figure \ref{fig:universalapprox} for a graphical example. 
+
+As it can be seen, by increasing the number of neurons one can easily control the fidelity of the approximation. This theorem proves that if we have enough neurons in the hidden layer, a \textit{multilayer perceptron} with only one hidden layer can approximate any continuous function to an arbitrary degree of precision.
+
 
 \begin{figure}[h!]
 	\centering
@@ -234,7 +237,7 @@ Other tricks that are commonly used nowadays to facilitate the parameters optimi
  
 
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.5\linewidth]{background/images/residual}
 	\caption[Example of a residual block]{Example of a residual block.}
@@ -262,7 +265,7 @@ Finally, another difference between modern and classical deep learning models is
 
 
 \subsection{Modern architectures}
-In this subsection we describe three modern architectures from a general perspective: convolutional neural networks (CNN), recurrent neural networks (RNN) and transformers.
+In this subsection three modern building blocks frequently used in the current deep learning architectures are described from a general perspective: convolutional neural networks (CNN), recurrent neural networks (RNN) and transformers. These architectures are the backbone of the majority of deep learning applications and the computational core of the systems presented throughout the next chapters.
 
 \subsubsection{Convolutional neural networks}
 A CNN is a type of feed-forward neural network that is commonly used in problems where the input data have grid-like topology \autocite{Goodfellow2016}. Common examples of these data are time-series (1D), images (2D) or videos (3D). CNNs are not new, and one of the most important primitive CNN is known as \textit{neocognitron}, a neural architecture published by \textit{Kuniko Fukushima}, as a model inspired in the primary cortex of the human brain that was able to recognize Japanese handwritten characters \autocite{fukushima1980}. This model was similar to modern convolutional neural networks, and even featured similar properties like weight sharing and translation equivariance (these properties are discussed below). The \textit{neocognitron} inspired future works like \textit{LeNet-5}, a 7-layer convolutional neural network (see figure \ref{fig:lenet5}) trained with \textit{backpropagation} to recognize handwritten digits \autocite{lecun1998}.
@@ -403,9 +406,9 @@ The goal of the deep generative models is to learn to approximate the probabilit
 
 The family of deep generative models is very diverse, and the models can be categorized into different types depending on the way they solve the generative task. Figure \ref{fig:generativetaxonomy} shows the taxonomy of the type of models discussed in this subsection. Some of the models allow evaluating the learned probability of data $p^\theta_\mathrm{model}(x)$ explicitly, others give an approximation for that distribution, and the others do not provide a way to interact with the probability density, yet allowing operations such as sampling from the implicit probability distribution \autocite{Goodfellow2016}. This subsection provides a description of the following families of deep generative models: \textit{fully visible belief networks} (FVBN), \textit{variational auto-encoders} (VAE), \textit{generative adversarial networks} (GAN) and \textit{normalizing flows} (NF).
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.7\linewidth]{background/images/generativetaxonomy}
+	\includegraphics[width=0.85\linewidth]{background/images/generativetaxonomy}
 	\caption[Taxonomy of deep generative models]{Taxonomy of the most common deep generative models.}
 	\label{fig:generativetaxonomy}
 \end{figure}
@@ -458,18 +461,19 @@ Other example of modern FVBN application is \autocite{Oord2016, Oord2016b}, an e
 
 The main idea of VAEs consists on replacing the $\mathbf{h}$ vector by the parameters of a distribution ($\mathbf{\upsilon}$), generally chosen to be a \textit{Gaussian} $N(\mu,\sigma)$, from which a latent vector is sampled $\mathbf{z} \sim p(\mathbf{\upsilon})$. Once the model is trained, new samples $\mathbf{\hat{x}}$ can be generated by decoding samples drawn from the prior distribution $\mathbf{\hat{x}} = f_d(\mathbf{z})$ where $\mathbf{z} \sim p(\mathbf{\upsilon})$. The structure of this deep learning architecture is shown in figure \ref{fig:vae}.
 
-\begin{figure}
-	\centering
-	\includegraphics[width=0.7\linewidth]{background/images/vae}
-	\caption[\textit{Variational auto-encoder}]{Diagram showing how a \textit{variational auto-encoder} is structured. }
-	\label{fig:vae}
-\end{figure}
 
 
 
 VAEs provide an explicit but intractable density function which cannot be directly optimized \autocite{Goodfellow2016}. Instead, variational \textit{Bayes} methods are used to approximate the intractable probability distributions. In this setting, the posterior probability $p_\mathbf{\theta}(\mathbf{z}|\mathbf{x})$ is intended to be computed. Applying the \textit{Bayes} theorem, we can express $p_\mathbf{\theta}(\mathbf{z}|\mathbf{x}) = \frac{p_\mathbf{\theta}(\mathbf{x}|\mathbf{z}) \cdot p_\mathbf{\theta}(\mathbf{z})}{p_\mathbf{\theta}(\mathbf{x})}$. In this equation, $p_\mathbf{\theta}(\mathbf{x}) = \int{p_\mathbf{\theta}(\mathbf{x}) \cdot p_\mathbf{\theta}(\mathbf{x}|\mathbf{z})} \,d\mathbf{z}$ is intractable, and hence it is not possible to optimize the parameters of a model that approximates that distribution using maximum likelihood. Here is where variational methods take place. 
 
-A known probability distribution $q$ with parameters $\phi$ will be used to approximate $p$ so that $q_\phi(\mathbf{z}|\mathbf{x}) \approx p_\mathbf{\theta}(\mathbf{z}|\mathbf{x})$. For that, the \textit{Kullback-Leibler} divergence ($D_{KL}$) metric will be used to minimize the differences between the two distributions, as shown in equation \ref{eq:dklvae} \autocite{kingma2019}. $\mathcal{L}(\mathbf{x}, \mathbf{\theta}, \phi)$, from equation equation \ref{eq:lbvae}, represents a lower bound (often referred as evidence lower bound, \textit{ELBO}, or negative free energy), given that $D_{K L}\left(q_{\phi}(\mathbf{z} \mid \mathbf{x}) \| p_{\mathbf{\theta}}(\mathbf{z} \mid \mathbf{x})\right)$ is always greater or equal to zero (see the optimization function in equation \ref{eq:vaelbasloss}). As the lower bound is tractable, the optimization problem can be approximated as shown in equation \ref{eq:vaeopt}. In other words, maximizing the lower bound assures that the log-likelihood of the data is at least as large as its lower bound \autocite{wei2021}.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=1\linewidth]{background/images/vae}
+	\caption[\textit{Variational auto-encoder}]{Diagram showing how a \textit{variational auto-encoder} is structured. }
+	\label{fig:vae}
+\end{figure}
+
+A known probability distribution $q$ with parameters $\phi$ will be used to approximate $p$ so that $q_\phi(\mathbf{z}|\mathbf{x}) \approx p_\mathbf{\theta}(\mathbf{z}|\mathbf{x})$. For that, the \textit{Kullback-Leibler} divergence ($D_{KL}$) metric will be used to minimize the differences between the two distributions, as shown in equation \ref{eq:dklvae} \autocite{kingma2019}. $\mathcal{L}(\mathbf{x}, \mathbf{\theta}, \phi)$, from equation \ref{eq:lbvae}, represents a lower bound (often referred as evidence lower bound, \textit{ELBO}, or negative free energy), given that $D_{K L}\left(q_{\phi}(\mathbf{z} \mid \mathbf{x}) \| p_{\mathbf{\theta}}(\mathbf{z} \mid \mathbf{x})\right)$ is always greater or equal to zero (see the optimization function in equation \ref{eq:vaelbasloss}). As the lower bound is tractable, the optimization problem can be approximated as shown in equation \ref{eq:vaeopt}. In other words, maximizing the lower bound assures that the log-likelihood of the data is at least as large as its lower bound \autocite{wei2021}.
 
 \begin{equation}
 \label{eq:dklvae}
@@ -494,18 +498,11 @@ A known probability distribution $q$ with parameters $\phi$ will be used to appr
 \mathbf{\theta}, \phi \leftarrow \underset{\mathbf{\theta}, \phi}{\arg \max } \sum_{i=1}^{N}\left(\mathcal{L}_{\mathbf{\theta}, \phi}(\mathbf{x})\right)
 \end{equation}
 
-The first term of the lower bound of equation \ref{eq:lbvae} ($\mathbb{E}_{\mathbf{z}} \log p_{\mathbf{\theta}}(\mathbf{x} \mid \mathbf{z})$) is known as the reconstruction error, and measures how dissimilar the input and the output are. The second term ($D_{K L}\left(q_{\phi}(\mathbf{z} \mid \mathbf{x}) \| p_{\mathbf{\theta}}(\mathbf{z})\right)$), usually referred as the divergence error, measures how dissimilar are the prior and the posterior distribution of the encoder. The probability distributions $p_\mathbf{\theta}$ and $q_\phi$ are two separated deep learning models (with parameter sets $\mathbf{\theta}$ and $\phi$). Normally, the prior distribution over the latent variables $P(\mathbf{z})$ is chosen to be an \textit{isotropic Gaussian} \autocite{wei2021} and in order to ensure that the encoder-decoder architecture is differentiable everywhere, the \textit{re-parameterization trick} is used as a mechanism to replace the classical non-differentiable sampling procedure $\mathbf{z} \sim N(\mathbf{\mu}, \mathbf{\sigma})$ by an equivalent version $\mathbf{z} = \mathbf{\mu} + \epsilon \cdot \mathbf{\sigma}$ where $\epsilon \sim N(0,I)$ in which $z$ is differentiable with respect to $\mathbf{\mu}$ and $\mathbf{\sigma}$ \autocite{kingma2019}.
+The first term of the lower bound of equation \ref{eq:lbvae} ($\mathbb{E}_{\mathbf{z}} \log p_{\mathbf{\theta}}(\mathbf{x} \mid \mathbf{z})$) is known as the reconstruction error, and measures how dissimilar the input and the output are. The second term ($D_{K L}\left(q_{\phi}(\mathbf{z} \mid \mathbf{x}) \| p_{\mathbf{\theta}}(\mathbf{z})\right)$), usually referred as the divergence error, measures how dissimilar are the prior and the posterior distributions of the encoder. The probability distributions $p_\mathbf{\theta}$ and $q_\phi$ are two separated deep learning models (with parameter sets $\mathbf{\theta}$ and $\phi$). Normally, the prior distribution over the latent variables $P(\mathbf{z})$ is chosen to be an \textit{isotropic Gaussian} \autocite{wei2021} and in order to ensure that the encoder-decoder architecture is differentiable everywhere, the \textit{re-parameterization trick} is used as a mechanism to replace the classical non-differentiable sampling procedure $\mathbf{z} \sim N(\mathbf{\mu}, \mathbf{\sigma})$ by an equivalent version $\mathbf{z} = \mathbf{\mu} + \epsilon \cdot \mathbf{\sigma}$ where $\epsilon \sim N(0,I)$, in which $z$ is differentiable with respect to $\mathbf{\mu}$ and $\mathbf{\sigma}$ \autocite{kingma2019}.
 
 
 \subsubsection{Generative adversarial networks}
 \textit{Generative adversarial networks} (GAN hereafter) are a type of deep generative models first published in 2014 \autocite{Goodfellow2014}. They consist of a dual deep learning model, where the first component, known as the generator, tries to generate realistic data samples, and the discriminator (the generator's adversary) attempts to determine if a given sample is real or generated. As an analogy, one can think of the generator as playing the role of a counterfeiter, and the discriminator playing the role of a police officer. The role of the counterfeiter is to try to fool the police officer, while the latter will try to catch the counterfeiter. Figure \ref{fig:police_counterfeiter} shows this process graphically.
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=1\textwidth]{background/images/police_counterfeiter.eps}
-	\caption[Generative adversarial network]{\textit{Generative adversarial network} diagram, showing the role of the generator and the discriminator and the error signals backpropagated through the network.}
-	\label{fig:police_counterfeiter}
-\end{figure}
 
 The training process of a GAN is generally a zero-sum game, where the optimization succeeds when the system reaches the \textit{Nash} equilibrium \autocite{nash48}. The goal of the algorithm is to learn to represent an estimated distribution ($p_{\mathrm{model}}$) of a given data distribution ($p_{\mathrm{data}}$). Moreover, GANs are designed to be unbiased \autocite{Goodfellow2016}, in the sense that provided with enough data, a model with enough capacity and the proper learning algorithm, the true probability distribution of the data can be perfectly recovered: $p_{\mathrm{model}} = p_{\mathrm{data}}$. As an important practical aspect of GANs, once the algorithm has converged the generator is able to synthesize samples of $p_\mathrm{model}$, however the learned probability density function (PDF) is implicit. GANs provide no access to the learned PDF.
 
@@ -523,9 +520,14 @@ In the GAN systems, the generator $f_g$ is a deep learning model with parameters
 
 The generator and discriminator models must be differentiable everywhere, otherwise the model cannot be trained with backpropagation. As an important detail that can be noticed in equation \ref{eq:ganminimax}, both players have a cost function (equation \ref{eq:ganloss}) that depends on the superset  of parameters $\{\theta^g, \theta^d\}$, but every player can only change its own parameters, and not the adversary's.
 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=1\textwidth]{background/images/police_counterfeiter.eps}
+	\caption[Generative adversarial network]{\textit{Generative adversarial network} diagram, showing the role of the generator and the discriminator and the error signals backpropagated through the network.}
+	\label{fig:police_counterfeiter}
+\end{figure}
 
-
-\subsubsection{Normalizing flows}
+\subsubsection{Normalizing flows} \label{sec:flows}
 \textit{Normalizing Flows} are another type of deep generative models that are used to approximate data distributions $p_\mathrm{data}$. These models describe the transformation of a prior density function $p(z)$ into an arbitrarily complex probability distribution $p_\mathrm{model}$, through a series of invertible mappings, by repeatedly applying the rule for change of variables \autocite{rezende2015}. The output of the series of invertible functions applied to the prior distribution is still a valid probability distribution, and hence this type of models is known as normalizing flow.
 
 A flow $f: \mathbb{R}^d \rightarrow \mathbb{R}^d$ is an invertible mapping (i.e. $\exists f^{-1}$) such that given a random variable $\mathbf{x} \sim p(\mathbf{x})$, then $f(f^{-1}(\mathbf{x})) = \mathbf{x}$. The probability density function $p(\mathbf{x})$ could be approximated by applying the rule for change of variables, as shown in equation \ref{eq:flowcov}, where $p(z)$ is known. Notice that the right hand side of the  equation \ref{eq:flowcov} comes from the application of the inverse function theorem \autocite{rezende2015}.

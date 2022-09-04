@@ -46,18 +46,22 @@ The proposed architecture builds upon the baseline model, removing the dependenc
 \end{figure}
 
 
-\subsection{Speaker embedding normalization using normalizing flows}
-Normalizing flows \autocite{rezende2015} are powerful methods for producing tractable distributions from which one can sample. Through a sequence of invertible transformations they transform a complex data distribution to a tractable probability distribution. The output distribution is usually chosen to be an isotropic unit \textit{Gaussian} to allow for smooth interpolations and efficient sampling.
+\subsection{Speaker embedding normalization with flows}
+Normalizing flows \autocite{rezende2015} are powerful methods for producing tractable distributions from which one can sample. Through a sequence of invertible transformations they transform a complex data distribution to a tractable probability distribution. The output distribution is usually chosen to be an isotropic unit \textit{Gaussian} (with mean 0 and variance 1) to allow for smooth interpolations and efficient sampling. A more detailed description of these models is given in chapter \ref{sec:flows}.
 
-\textit{Glow} \autocite{kingma2018}, a flow-based generative model, has shown significant improvements in computer vision generative modeling by adding invertible 1x1 convolutions to the sequence of transformations applied to the input. To train this model on one-dimensional speaker embedding vectors, the 2-dimensional convolutions have been replaced with 1-dimensional ones.
+\textit{Glow} \autocite{kingma2018}, a flow-based generative model, has shown significant improvements in computer vision generative modeling by adding invertible 1x1 convolutions to the sequence of transformations applied to the input. To train this model on one-dimensional speaker embedding vectors, the 2-dimensional convolutions from the original architecture, designed for computer vision tasks, have been replaced with 1-dimensional ones.
 
-A normalizing flow has been trained to normalize the pre-trained speaker embeddings described previously. The trained model attains a \textit{Gaussian} distributed latent space of speaker embeddings from which one can easily sample to create embeddings representing new, unseen speakers. The proposed architecture samples from the \textit{Gaussian} distribution defined by the normalized embeddings, both at training time and at inference time.
+A normalizing flow has been trained to normalize the pre-trained speaker embeddings described previously. The trained model attains a \textit{Gaussian} distributed latent space of speaker embeddings from which one can easily sample to create embeddings representing new, unseen speakers. The proposed architecture samples speaker representations from the \textit{Gaussian} distribution defined by the normalized embeddings, both at training time and at inference time.
 
 
 \subsection{Residual branch}
-The new residual branch is designed to learn the prosody-induced variance that cannot be explained by the linguistic features and the speaker embedding vector alone. It takes as input the linguistic features and a set of learnable free parameters\footnote{Notice that the dense layers that produce the residual latent distribution parameters do not have bias terms, so that all the bias is learned in the free parameters vector.}, conditioning on the target sentence and on a global prior. The motivation behind this design is to help the network learn different ways of uttering a given input sentence (linguistic features conditioning), and the potential global biases existing in the training dataset (free parameters).
+The new residual branch is designed with the idea of giving the model the capability to learn the prosody-induced variance that cannot be explained by the linguistic features and the speaker embedding vector alone. It takes as input the linguistic features and a set of learnable free parameters\footnote{Notice that the dense layers that produce the residual latent distribution parameters do not have bias terms, so that all the bias is learned in the free parameters vector.}, conditioning on the target sentence and on a global prior. The motivation behind this design is to help the network learn different ways of uttering a given input sentence (linguistic features conditioning), and the potential global biases existing in the training dataset (free parameters).
 
-The output of the phonetic encoder $\mathbf{h_{\text{ph}}}$ is piped into a bidirectional recurrent neural network \autocite{schuster1997,graves2005} in order to get a representation independent of time. The last output of the recurrent neural network of both, forward and reverse passes (represented in equations \ref{eq:rnn1} and \ref{eq:rnn2} as $\mathbf{o_f}$ and $\mathbf{o_r}$, respectively), are  concatenated to form a fixed-size phonetic representation $[\mathbf{o_f}, \mathbf{o_r}]$. That vector is concatenated with a vector of free parameters $\mathbf{v_f}$ and the result is passed through two stacked dense layers to form the parameters of the residual latent distribution (as shown in equation \ref{eq:residual}, where $g$ represents the \textit{ReLU} activation function). The $h_{residual}$ vector is split in two vectors $h_{residual}^{\mu}$ and $h_{residual}^{\sigma}$ from where a latent vector $z$ is sampled using the re-parametrization trick \autocite{kingma2019}. Finally, a \textit{Kullback-Leibler} loss is included to assure that the distribution of the latent representation approximates an isotropic \textit{Gaussian} distribution.
+The output of the phonetic encoder $\mathbf{h_{\text{ph}}}$ is piped into a bidirectional recurrent neural network \autocite{schuster1997,graves2005} in order to get a representation independent of time. The last output of the recurrent neural network of both, forward and reverse passes (represented in equations \ref{eq:rnn1} and \ref{eq:rnn2} as $\mathbf{o_f}$ and $\mathbf{o_r}$, respectively), are  concatenated to form a fixed-size phonetic representation $[\mathbf{o_f}, \mathbf{o_r}]$. 
+
+The joined output vector of the bidirectional \textit{RNN} stage is concatenated with a vector of free parameters $\mathbf{v_f}$ and the result is passed through two stacked dense layers to form the parameters of the residual latent distribution (as shown in equation \ref{eq:residual}, where $g$ represents the \textit{ReLU} activation function). The $h_{residual}$ vector is split in two vectors $h_{residual}^{\mu}$ and $h_{residual}^{\sigma}$ from where a latent vector $z$ is sampled using the re-parametrization trick \autocite{kingma2019}. 
+
+Finally, a \textit{Kullback-Leibler} divergence loss is included to assure that the distribution of the latent representation approximates an isotropic \textit{Gaussian} distribution.
 
 \begin{equation}
  \label{eq:rnn1}
@@ -140,7 +144,7 @@ To measure how much prosody and quality variance the new model introduces with r
 	\scriptsize
 		\centering
 	\caption[Summary of prosody variability metrics for TTS models]{Metrics used to quantify the prosody variation and quality across different models.}
-	\begin{tabular}{p{0.1\textwidth}|p{0.8\textwidth}}
+	\begin{tabular}{p{0.3\textwidth}|p{0.7\textwidth}}
 		\toprule
 		Metric & Description \\
 		\midrule

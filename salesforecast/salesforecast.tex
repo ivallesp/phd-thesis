@@ -34,7 +34,7 @@ The \textit{Corporación Favorita Grocery Sales} dataset  has been used to condu
 	\item \textit{Holidays and events}: dates, locations and types of holidays.
 \end{itemize}
 
-As it is usual in the supply chain organizations, the distribution of sales across products is very uneven (see Figure \ref{fig:tails}-left where the top 10\% of the products bring the 44\% of the sales). The same characteristic is observed in the case of the stores (see Figure \ref{fig:tails}-right where the top 10 stores bring 40\% of the sales). The sales for some products are very sparse: during the test period, the probability of having one or more sells for a given product in a given day is 47.6\%, which in practice means that more than half of the days in the time series will have value of zero.
+As it is usual in the supply chain organizations, the distribution of sales across products is very uneven (see Figure \ref{fig:tails}-left where the top 10\% of the products bring the 44\% of the sales). The same characteristic is observed in the case of the stores (see Figure \ref{fig:tails}-right where the top 10 stores bring 40\% of the sales). The sales for some products are very sparse: during the test period, the probability of having any sells for a given product in a given day is 47.6\%, i.e. more than half of the days in the time series will have value of zero.
 
 \begin{figure}
 	\centering
@@ -44,18 +44,18 @@ As it is usual in the supply chain organizations, the distribution of sales acro
 	\label{fig:tails}
 \end{figure}
 
-As it can be noticed in Figure \ref{fig:timeseries}, the total sales show clear year on year trends as well as a very remarkable weekly seasonality (see Figure \ref{fig:timeseries_detail}). There is also a peak of sales at the end of each year.
+As it can be noticed in Figure \ref{fig:timeseries}, the total sales show clear year on year trends as well as a very remarkable weekly seasonality (see Figure \ref{fig:timeseries_detail}). There is also a peak of sales at the end of each year
 
- 	\begin{figure}
+ 	\begin{figure}[h]
  	\centering
  	\includegraphics[width=1\textwidth]{salesforecast/images/timeseries}
  	\caption[Daily total sales for the 5 years included in the data]{Daily total sales for the 5 years included in the data.}
  	\label{fig:timeseries}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
 	\centering
-	\includegraphics[width=0.6\textwidth]{salesforecast/images/timeseries_dow}
+	\includegraphics[width=0.8\textwidth]{salesforecast/images/timeseries_dow}
 	\caption[Weekly sales pattern details]{Weekly pattern detail, including the 2014 sales.}
 	\label{fig:timeseries_detail}
 \end{figure}
@@ -102,6 +102,15 @@ The decoder module is an auto-regressive model trained to predict the immediate 
 
 The attention mechanism can be described as shown in equation \ref{eq:mhaconcat}. Where $Q$, $K$, $V$ stand for \textit{query}, \textit{key} and \textit{value}, respectively. These three pieces represent an analogy, introduced by \autocite{vaswani2017}, of the information retrieval systems where a \textit{query} is used in order to look for the matching \textit{key} (or the most similar one) and retrieving its \textit{value}. The attention mechanism working principle is similar to those systems (refer to section \ref{sec:transformer} for a deeper review of the attention mechanism). There are many possible differentiable similarity functions ($f$) that can be used \autocite{uday2019}. The authors of \autocite{vaswani2017} propose the Scaled dot product as similarity function, given that it is scaled so that different length sequences can be easily compared together. The Scaled dot product is defined in equation \ref{eq:scdotprod},  where $d_K$ represents the length of the key vector $K$. This version was adopted as it showed to work well in the initial transformer publication. The transformer architecture is described in detail in section \ref{sec:transformer}.
 
+% TODO: \usepackage{graphicx} required
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.7\linewidth]{salesforecast/images/transformer}
+	\caption[Diagram of the \textit{transformer} architecture]{Transformer architecture used to perform time series forecasting. In the diagram, the $||$ symbol stands for the concatenation operation, and similarly as in \autocite{vaswani2017}, $N_X$ represents the number of repetitions of the encoder and decoder blocks.}
+	\label{fig:salesforecast_transformer}
+\end{figure}
+
+
 A slight modification has been performed over the original transformer, removing the \textit{softmax} operation of the output and only using the categorical embeddings for the categorical inputs. This is necessary in this case because the task is a regression and not a classification.
 
 Following the information retrieval analogy and as illustrated in the figure \ref{fig:salesforecast_transformer}, there are two types of attention being used in this architecture.
@@ -115,13 +124,6 @@ To train the \textit{transformer} architecture the \textit{teacher forcing} tech
 
 At inference time, \textit{teacher forcing} is no longer available (because the future time steps of the time series are unknown) so auto-regression is used to compute the next steps recursively (i.e. the predicted sample is fed back to the input in order to predict the next sample). For a more detailed discussion of the transformer architecture, refer to section \ref{sec:transformer}.
 
-% TODO: \usepackage{graphicx} required
-\begin{figure}[h!]
-   	\centering
-   	\includegraphics[width=0.7\linewidth]{salesforecast/images/transformer}
-   	\caption[Diagram of the \textit{transformer} architecture]{Transformer architecture used to perform time series forecasting. In the diagram, the $||$ symbol stands for the concatenation operation, and similarly as in \autocite{vaswani2017}, $N_X$ represents the number of repetitions of the encoder and decoder blocks.}
-   	\label{fig:salesforecast_transformer}
-\end{figure}
 
 \subsection{Random max time step trick}
 At training time and with the aim of improving generalization over different periods of time, each \textit{mini-batch} has been constructed so that the maximum time step (the most recent one)  is drawn randomly from the time line. This trick allows the algorithm to learn a model that generalizes over different periods of time, preventing it to overfit to a single time span.
