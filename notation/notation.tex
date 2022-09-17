@@ -1,7 +1,7 @@
 %!TEX root = ../thesis.tex
 \chapter*{Notation} \label{ch:notation}
 \addcontentsline{toc}{chapter}{Notation}
-This section summarizes the notation conventions followed in this dissertation. As a general note, bold lowercase symbols (e.g. $\mathbf{x}$) have been used to denote vectors, while bold uppercase (e.g. $\mathbf{X}$) symbols represent matrices. Non bold symbols (e.g. $x$) have been used to represent scalars. This convention will be followed throughout the dissertation unless specified.
+This section summarizes the notation conventions followed in this dissertation. As a general note, bold lowercase symbols (e.g. $\mathbf{x}$) have been used to denote vectors, while bold uppercase (e.g. $\mathbf{X}$) symbols represent matrices. Non bold symbols (e.g. $x$) have been used to represent scalars. This convention will be followed throughout the dissertation unless otherwise specified.
 
 \section*{Data }
 
@@ -10,7 +10,7 @@ This section summarizes the notation conventions followed in this dissertation. 
 	\item [$\mathbf{x_i}$] a vector of length $D$ where each element represents a particular feature (e.g. age, weight, or IQ of a person).
 	\item [$\mathbf{Y}$] a matrix with shape $N \times K$ containing desired output vectors rows $\{\mathbf{y_1},...,\mathbf{y_i},...,\mathbf{y_K}\}$, where each output vector $\mathbf{y_i} \in \mathbb{R}^K$.
 	\item [$\mathbf{y_i}$]  a vector of length $K$ where each element is one of the scalar desired outputs (e.g. the probability of an image containing a dog).
-	\item [$\mathbf{T}$] a dataset  of examples with inputs and desired outputs for supervised learning tasks, composed of a set of pairs of vectors from $\mathbf{X}$ and $\mathbf{Y}$, grouped as follows: $\{(\mathbf{x_1}, \mathbf{y_1})...,(\mathbf{x_i}, \mathbf{y_i}),...,(\mathbf{x_N}, \mathbf{y_N})\}$, where each tuple represents a training example.
+	\item [$\mathbf{T}$] a dataset  of examples with inputs and desired outputs for supervised learning tasks, composed of a set of pairs of vectors from $\mathbf{X}$ and $\mathbf{Y}$, grouped as follows: $\{(\mathbf{x_1}, \mathbf{y_1}),...,(\mathbf{x_i}, \mathbf{y_i}),...,(\mathbf{x_N}, \mathbf{y_N})\}$, where each tuple represents a training example.
 	\item [$\mathbf{U}$] a dataset of examples for unsupervised learning tasks, composed of a set of input vectors from $\mathbf{X}$, disposed as follows: $\{\mathbf{x_1},...,\mathbf{x_i},...,\mathbf{x_N}\}$, where each element $\mathbf{x_i} \in \mathbb{R}^D$ represents a training example.
 	\item [$N$] number of examples in a dataset.
 	\item [$D$]  number of features in a dataset or in a feature vector.
@@ -28,7 +28,7 @@ This section summarizes the notation conventions followed in this dissertation. 
 	\item [$\mathbf{\theta}, \mathbf{\phi}$] vector containing all the parameters of a neural network model.
 	\item [$f_\mathbf{\theta}(\cdot)$] neural network model with parameters $\mathbf{\theta}$.
 	\item [$J(\cdot, \cdot)$] cost function, i.e. function quantifying the error intended to be minimized, often using gradient descent.
-	\item [$\mathbf{W}, \mathbf{U}$] weight matrices of a neural network layer which scalar components are denoted by $w_{ij}$.
+	\item [$\mathbf{W}, \mathbf{U}$] weight matrices of a neural network layer whose scalar components are denoted by $w_{ij}$ ($u_{ij}$).
 	\item[$g(\cdot)$] activation function.
 	\item[$G(\cdot)$] multilayer \textit{perceptron}.
 	\item[$\mathbf{S}$] feature map in a convolutional neural network, result of performing a cross-correlation operation on an input $\mathbf{X}$ with a kernel $\mathbf{W}$.
@@ -52,7 +52,7 @@ This section summarizes the notation conventions followed in this dissertation. 
 \begin{labeling}{alligator}
 	\item [$D_{KL}$]{\textit{Kullback-Leibler} (KL) divergence between two distributions.}
 	\item [$p(\cdot)$]{probability distribution.}
-	\item [$H(\cdot)$] \textit{Heavyside} function.
+	\item [$H(\cdot)$] \textit{Heaviside} function.
 	\item [$\sigma(\cdot)$] \textit{sigmoid} function.
 	\item [$\tau(\cdot)$] hyperbolic tangent function ($\tanh(\cdot)$).
 	\item [$\mathrm{sgn}(\cdot)$] Sign function.
