@@ -136,7 +136,7 @@ While it is true that, as more unrecognized words are grouped under the ``unknow
 
 
 \subsection{Data augmentation}
-Five different augmentations\footnote{meaning distorted versions of each of the clips in the original data} consisting of the application of a set of distortions have been performed to each and every audio clip. These distortions consist of a set of transformations being applied together over all the clips randomizing their parameters and intensities in each case. The different distortions used in this step are described below.
+Five different augmentations\footnote{Meaning distorted versions of each of the clips in the original data.} consisting of the application of a set of distortions have been performed to each and every audio clip. These distortions consist of a set of transformations being applied together over all the clips randomizing their parameters and intensities in each case. The different distortions used in this step are described below.
 
 \begin{itemize}
 	\item \textit{Resampling}: the audio clip is resampled extending or contracting its length and hence changing its pitch \autocite{Proakis2007}. If the resampling factor is lower than one, the audio clip is contracted and then the audio duration is zero-padded to keep the original duration of the original clips. On the contrary, if the resampling factor is greater than one, the audio clip is extended and a \textit{center-crop} operation is performed in order to keep the original length of one second.
@@ -177,7 +177,7 @@ The \textit{depthwise convolution} does not combine different channels for produ
 
 The number of sums and multiplications required by this operation is $\frac{1}{R} \cdot \frac{1}{O}$ times the number of operations required by a regular convolution (details below)  \autocite{howard2017}, where $O$ is the size of the \textit{depthwise convolution} filters and $R$ is the number of output channels after the \textit{pointwise convolution} is applied. This represents a meaningful performance improvement for big networks.
 
-More formally, the \textit{regular convolution} and \textit{depthwise convolution} operations \autocite{howard2017}  are defined\footnote{in both cases assuming a stride of one, \textit{SAME} padding and odd size convolution kernels} in equations \ref{eq:reg_conv} and  \ref{eq:dw_conv} for illustrative purposes, where
+More formally, the \textit{regular convolution} and \textit{depthwise convolution} operations \autocite{howard2017}  are defined\footnote{In both cases assuming a stride of one, \textit{SAME} padding and odd size convolution kernels.} in equations \ref{eq:reg_conv} and  \ref{eq:dw_conv} for illustrative purposes, where
 
 \begin{itemize}
 	\item $\mathbf{X}$ is the feature map over which the convolution operation is intended to be applied. It has a shape of $D \times M$, where $D$ represents the spatial/temporal dimension and $M$ the number of input channels.
@@ -210,7 +210,7 @@ $$ \frac{D \cdot M \cdot O  + D \cdot M \cdot R} {D \cdot M \cdot R \cdot O} = \
 \subsection{\textit{Xception-1d} architecture}
 The proposed architecture exploits the gain in computational efficiency of the \textit{depthwise-separable convolution} operation over the \textit{regular convolution} in the same way original \textit{Xception} does \autocite{chollet2017}. That allows a more efficient resource and time management and hence, a more complex architecture can be defined.
 
-The \textit{Xception-1d} architecture is depicted in Figure \ref{fig:arch}. It has a total of 37 layers, 34 of which are \textit{depthwise-separable convolutional layers}, 2 of them are \textit{regular convolutions}, and the last one is a dense layer performing a logistic regression. The network contains 12 residual connections, one in each residual block, as shown in Figure \ref{fig:xceptionmodule}. All of it builds up a network with up to 21 million parameters in the case of the \textit{left-right recognition}  task and 23 million parameters in the \textit{35-words recognition} one\footnote{The difference lays on the last layer implementing the logistic regression of the architecture. Depending on the number of outputs required by each task, the number of parameters in this layer varies. The maximum difference occurs between the \textit{35-words recognition} task and the \textit{left-right recognition}}.
+The \textit{Xception-1d} architecture is depicted in Figure \ref{fig:arch}. It has a total of 37 layers, 34 of which are \textit{depthwise-separable convolutional layers}, 2 of them are \textit{regular convolutions}, and the last one is a dense layer performing a logistic regression. The network contains 12 residual connections, one in each residual block, as shown in Figure \ref{fig:xceptionmodule}. All of it builds up a network with up to 21 million parameters in the case of the \textit{left-right recognition}  task and 23 million parameters in the \textit{35-words recognition} one\footnote{The difference lays on the last layer implementing the logistic regression of the architecture. Depending on the number of outputs required by each task, the number of parameters in this layer varies. The maximum difference occurs between the \textit{35-words recognition} task and the \textit{left-right recognition}.}.
 
 \begin{figure}[ht]
 	\centering
@@ -233,7 +233,7 @@ Considering that the last dense layer can be prone to overfitting due to the hig
 
 
 
-\textit{Instance normalization}  has been used to normalize the intermediate outputs of each convolution \autocite{Ulyanov2016, Zheng2018}. It simply consists of standardizing separately each of the channels of every instance. Although it is typically used in generative modeling and style transfer efforts, it demonstrated to be very useful to improve training time of convergence and it has no undesirable effects at test time\footnote{In the case of \textit{batch normalization}, there can appear big differences of performance between train time and test time \autocite{Ba2016}} \autocite{Ulyanov2016}; it is considered a key element of this architecture. The input of the dense layer has been normalized using \textit{layer normalization} \autocite{Ba2016}. \textit{Batch normalization} \autocite{ioffe2015} has been avoided because it is prone to introduce \textit{covariance shift}, degrading generalization \autocite{Ba2016}. In figure \ref{fig:normcubes} the way these three normalization techniques operate is represented.
+\textit{Instance normalization}  has been used to normalize the intermediate outputs of each convolution \autocite{Ulyanov2016, Zheng2018}. It simply consists of standardizing separately each of the channels of every instance. Although it is typically used in generative modeling and style transfer efforts, it demonstrated to be very useful to improve training time of convergence and it has no undesirable effects at test time\footnote{In the case of \textit{batch normalization}, there can appear big differences of performance between train time and test time \autocite{Ba2016}.} \autocite{Ulyanov2016}; it is considered a key element of this architecture. The input of the dense layer has been normalized using \textit{layer normalization} \autocite{Ba2016}. \textit{Batch normalization} \autocite{ioffe2015} has been avoided because it is prone to introduce \textit{covariance shift}, degrading generalization \autocite{Ba2016}. In figure \ref{fig:normcubes} the way these three normalization techniques operate is represented.
 
 
 
@@ -295,7 +295,7 @@ Besides the global results, figure \ref{fig:boxplot35002} shows the precision an
 \scalebox{0.75}{
 \begin{tabular}{lcccccc}
 	\hline
-	            & \textit{Coimbra} &   \textit{Zhang}\footnote{the  best results obtained among all the trials performed by the autors have been selected \label{foot:max}} & \textit{Warden} &           \textit{Xception-1d}           &     Human    & p-value \footnote{Student's t-test for the comparison of two means. $\alpha = 0.05$ \label{foot:ttest}} \\ \hline
+	            & \textit{Coimbra} &   \textit{Zhang}\footnote{The  best results obtained among all the trials performed by the autors have been selected \label{foot:max}.} & \textit{Warden} &           \textit{Xception-1d}           &     Human    & p-value \footnote{Student's t-test for the comparison of two means. $\alpha = 0.05$ \label{foot:ttest}.} \\ \hline
 	35-words    &               93.90               &               -               &            -             & \textbf{95.85 $\pm$ 0.16 *} & 94.15 $\pm$ 1.03 & $1.50\cdot 10^{-2}$ \\
 	20-commands &               94.50               &               -               &            -             & \textbf{95.96 $\pm$ 0.16 *} & 94.56 $\pm$ 0.98 & $2.70\cdot 10^{-2}$\\
 	10-commands &               96.90               &             95.40             &          88.20           & \textbf{97.54 $\pm$ 0.08}  & 97.22 $\pm$ 0.85 & $4.84\cdot 10^{-1}$ \\
