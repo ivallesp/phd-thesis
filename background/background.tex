@@ -163,13 +163,7 @@ x,          & \text{if } x \geq 0 ,\\
 \end{cases}
 \end{equation}
 
-The \textit{backpropagation} algorithm has certain rules that need to be met \autocite{hinton1986}: 
-
-\begin{enumerate}
-	\item Connections from higher level neurons to lower level ones are forbidden, but connections that skip layers are totally permitted.
-	\item The architecture must be fully differentiable to be able to backpropagate the errors. 
-	\item The weights must not all be initialized to the same fixed value, but they must be set to random values instead, to break the symmetrical weights between layers (which would cause the optimization to stall, see \autocite{hinton1986} for more details). 
-\end{enumerate}
+The \textit{backpropagation} algorithm has certain rules that need to be met \autocite{hinton1986}: (1) connections from higher level neurons to lower level ones are forbidden, but connections that skip layers are totally permitted, (2) the architecture must be fully differentiable to be able to backpropagate the errors, and (3) the weights must not all be initialized to the same fixed value, but they must be set to random values instead, to break the symmetrical weights between layers (which would cause the optimization to stall, see \autocite{hinton1986} for more details). 
 
 
 Despite meeting these rules, there are no theoretical guarantees for the algorithm to find the global minimum: it can get stuck in local minima. One possible way to avoid this problem consists of running the optimization several times with different random parameter initializations \autocite{haykin1998}. The usage of gradient-free methods such as evolutionary optimization techniques \autocite{sivanandam2008} have also been explored by the deep learning research community, sometimes leading to promising results \autocite{omid2014, vallesperez2012}. However, these algorithms are usually less computationally efficient than gradient-based ones, making them unfeasible when the training data or the model size are large.
@@ -213,7 +207,7 @@ After \textit{Cybenko}, other studies \autocite{Leshno1993, pinkus1999} proved t
 
 
 \subsection{Deeper neural networks} \label{sec:deepernn}
-Regardless the emergence of the \textit{backpropagation} algorithm, training a \textit{multilayer perceptron} with many layers was \textit{challenging}. The first successful methodology for training deep neural networks consisted on pre-training the weights of the network in an unsupervised fashion, using stacks of \textit{restricted Boltzmann machines} (RBM; \citealp{Smolensky1986}) known as deep belief networks \autocite{hinton2006, Bengio2007}. A \textit{restricted Boltzmann machine} (initially called \textit{Harmonium}) is a type of neural network built using a bidirectional bipartite graph architecture, with symmetric connections of neurons between the two layers and without connections between neurons within the same layer (as shown in figure \ref{fig:rbm}). This model is trained to learn hidden abstract representations of the input, from which it is possible to recover the original probability distribution $p_\theta(x|h) \approx p(x)$. The training procedure is based on an approximate \textit{maximum-likelihood} method called \textit{contrastive divergence} (CD) \autocite{hinton2002}.
+Regardless the emergence of the \textit{backpropagation} algorithm, training a \textit{multilayer perceptron} with many layers was \textit{challenging}. The first successful methodology for training deep neural networks consisted on pre-training the weights of the network in an unsupervised fashion, using stacks of \textit{restricted Boltzmann machines} (RBM; \citealp{Smolensky1986}) known as deep belief networks \autocite{hinton2006, Bengio2007}. A \textit{restricted Boltzmann machine} (initially called \textit{Harmonium}) is a type of neural network built using a bidirectional bipartite graph architecture, with symmetric connections of neurons between the two layers and without connections between neurons within the same layer (as shown in figure \ref{fig:rbm}). This model is trained to learn hidden abstract representations of the input, from which it is possible to recover the original probability distribution $p_\theta(x|h) \approx p(x)$. The training procedure is based on an approximate \textit{maximum-likelihood} method called \textit{contrastive divergence} (CD; \citealp{hinton2002}).
 
 \begin{figure}[h!]
 	\centering
